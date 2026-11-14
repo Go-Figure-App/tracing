@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useIsFetching, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Calendar, MoreHorizontal, User } from "lucide-react-native";
 import { useState } from "react";
@@ -53,6 +53,12 @@ export function InitiativeDetailScreen({
     enabled,
   });
   const initiative = query.isError ? undefined : query.data;
+  const client = useQueryClient();
+  const updatesQueryKey = ["parity", "updates", "initiative", initiativeId];
+  const updatesFetching = useIsFetching({
+    queryKey: updatesQueryKey,
+    exact: true,
+  });
   const permissions = usePlanningPermissions(initiative?.workspaceId);
   const canEdit =
     !initiative?.archivedAt && Boolean(permissions.data?.updateProjects);
@@ -115,8 +121,18 @@ export function InitiativeDetailScreen({
               ]}
             />
             <Scroll
-              refreshing={query.isRefetching}
-              onRefresh={() => void query.refetch()}
+              refreshing={
+                query.isRefetching || (tab === "updates" && updatesFetching > 0)
+              }
+              onRefresh={() => {
+                void query.refetch();
+                if (tab === "updates")
+                  void client.refetchQueries({
+                    queryKey: updatesQueryKey,
+                    exact: true,
+                    type: "active",
+                  });
+              }}
               bottomPadding={bottom + 24}
             >
               <View style={{ paddingTop: 20 }}>

@@ -8,6 +8,7 @@ import { Txt } from "@/components/text";
 import { Button, Touch } from "@/components/ui";
 import { api } from "@/lib/api/endpoints";
 import { userMessage } from "@/lib/api/client";
+import { currentLocale } from "@/lib/i18n";
 import { qk } from "@/lib/query";
 import { priorityLabel } from "@/lib/style";
 import { useColors } from "@/theme";
@@ -115,7 +116,9 @@ export function CycleTaskFiltersBar({
       >
         <Txt variant="meta">
           {t("mobile:parity.planning.filters")}
-          {activeCount ? ` (${activeCount})` : ""}
+          {activeCount
+            ? ` (${new Intl.NumberFormat(currentLocale()).format(activeCount)})`
+            : ""}
         </Txt>
       </Touch>
       {expanded && (

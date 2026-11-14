@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useIsFetching, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Calendar, MoreHorizontal, User } from "lucide-react-native";
 import { useState } from "react";
@@ -46,6 +46,15 @@ export function ProjectOverview({ projectId }: { projectId: string }) {
     enabled,
   });
   const project = query.isError ? undefined : query.data;
+  const client = useQueryClient();
+  const dependentQueryKey =
+    tab === "updates"
+      ? ["parity", "updates", "project", projectId]
+      : ["parity", "roadmap", project?.workspaceId];
+  const dependentFetching = useIsFetching({
+    queryKey: dependentQueryKey,
+    exact: true,
+  });
   const permissions = usePlanningPermissions(project?.workspaceId);
   const edit =
     project && permissions.data?.updateProjects
@@ -106,8 +115,15 @@ export function ProjectOverview({ projectId }: { projectId: string }) {
               }}
             />
             <Scroll
-              refreshing={query.isRefetching}
-              onRefresh={() => void query.refetch()}
+              refreshing={query.isRefetching || dependentFetching > 0}
+              onRefresh={() => {
+                void query.refetch();
+                void client.refetchQueries({
+                  queryKey: dependentQueryKey,
+                  exact: true,
+                  type: "active",
+                });
+              }}
               bottomPadding={bottom + 24}
             >
               <View style={{ padding: 20, gap: 24 }}>
