@@ -5728,7 +5728,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "Без групування",
+			"searchProjects": "Пошук проєктів",
+			"searchInitiatives": "Пошук ініціатив",
+			"allInitiatives": "Усі ініціативи",
+			"properties": "Властивості"
 		},
 		"roadmap": {
 			"title": "Roadmap",

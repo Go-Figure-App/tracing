@@ -5450,7 +5450,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "Tanpa pengelompokan",
+			"searchProjects": "Cari proyek",
+			"searchInitiatives": "Cari inisiatif",
+			"allInitiatives": "Semua inisiatif",
+			"properties": "Properti"
 		},
 		"roadmap": {
 			"title": "Roadmap",

@@ -5542,7 +5542,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "कोई समूह नहीं",
+			"searchProjects": "प्रोजेक्ट खोजें",
+			"searchInitiatives": "पहल खोजें",
+			"allInitiatives": "सभी पहल",
+			"properties": "गुण"
 		},
 		"roadmap": {
 			"title": "Roadmap",

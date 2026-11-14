@@ -46,107 +46,115 @@ export function CycleOverview({
     timeZone: cycle.settings.timeZone,
   });
   return (
-    <div className="space-y-7">
-      <header className="space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="mb-1 text-xs text-muted-foreground">
-              {t(`parity:cycles.${cycle.phase}`)}
-            </div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {cycle.name ??
-                t("parity:cycles.number", { number: cycle.number })}
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {date.format(new Date(cycle.startsAt))} –{" "}
-              {date.format(new Date(+new Date(cycle.endsAt) - 1))}
-            </p>
-          </div>
-          <FavoriteButton
-            workspaceId={workspaceId}
-            kind="cycle"
-            targetId={cycleId}
-          />
-          {canUpdateProjects() && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="size-3.5" />
-              {t("parity:cycles.edit")}
-            </Button>
-          )}
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border p-4">
-            <div className="text-xs text-muted-foreground">
-              {t("parity:cycles.completed")}
-            </div>
-            <div className="mt-1 text-lg font-semibold tabular-nums">
-              {t("parity:cycles.completion", { percent })}
-            </div>
-            <div className="mt-1 text-xs text-muted-foreground">
-              {t("parity:cycles.progress", {
-                completed: totals.completedCount,
-                total: totals.scopeCount,
-              })}
-            </div>
-            <div
-              className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
-              role="progressbar"
-              aria-label={t("parity:cycles.completed")}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={percent}
-            >
-              <div
-                className="h-full rounded-full bg-primary"
-                style={{ width: `${percent}%` }}
-              />
-            </div>
-          </div>
-          <div className="rounded-lg border p-4">
-            <div className="text-xs text-muted-foreground">
-              {t("parity:cycles.scope")}
-            </div>
-            <div className="mt-1 text-lg font-semibold tabular-nums">
-              {new Intl.NumberFormat(i18n.language).format(totals.scopeCount)}
-            </div>
-            {cycle.settings.estimateScale !== "none" && (
-              <div className="mt-1 text-xs text-muted-foreground">
-                {t("parity:cycles.totalPoints", { count: totals.scopePoints })}
+    <div className="grid min-h-0 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="min-w-0">
+        <CycleTaskList
+          cycleId={cycle.id}
+          workspaceId={workspaceId}
+          settings={cycle.settings}
+        />
+      </div>
+      <aside className="order-first min-w-0 space-y-5 rounded-lg border border-border/60 bg-card/40 p-4 lg:order-last lg:sticky lg:top-0 lg:self-start">
+        <header className="space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="mb-1 text-xs text-muted-foreground">
+                {t(`parity:cycles.${cycle.phase}`)}
               </div>
+              <h1 className="text-base font-semibold tracking-tight">
+                {cycle.name ??
+                  t("parity:cycles.number", { number: cycle.number })}
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {date.format(new Date(cycle.startsAt))} –{" "}
+                {date.format(new Date(+new Date(cycle.endsAt) - 1))}
+              </p>
+            </div>
+            <FavoriteButton
+              workspaceId={workspaceId}
+              kind="cycle"
+              targetId={cycleId}
+            />
+            {canUpdateProjects() && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditing(true)}
+              >
+                <Pencil className="size-3.5" />
+                {t("parity:cycles.edit")}
+              </Button>
             )}
           </div>
-          <div className="rounded-lg border p-4">
-            <div className="text-xs text-muted-foreground">
-              {cycle.summary
-                ? t("parity:cycles.rolledOver")
-                : t("parity:cycles.remaining")}
-            </div>
-            <div className="mt-1 text-lg font-semibold tabular-nums">
-              {new Intl.NumberFormat(i18n.language).format(
-                cycle.summary?.rolledOverCount ??
-                  Math.max(0, totals.scopeCount - totals.completedCount),
-              )}
-            </div>
-            {cycle.phase === "current" && (
+          <div className="grid grid-cols-3 gap-3 border-y border-border/60 py-4">
+            <div className="min-w-0">
+              <div className="text-xs text-muted-foreground">
+                {t("parity:cycles.completed")}
+              </div>
+              <div className="mt-1 text-base font-medium tabular-nums">
+                {new Intl.NumberFormat(i18n.language, {
+                  style: "percent",
+                }).format(percent / 100)}
+              </div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {t("parity:cycles.daysLeft", {
-                  count: daysLeft(cycle.endsAt, cycle.settings.timeZone),
+                {t("parity:cycles.progress", {
+                  completed: totals.completedCount,
+                  total: totals.scopeCount,
                 })}
               </div>
-            )}
+              <div
+                className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"
+                role="progressbar"
+                aria-label={t("parity:cycles.completed")}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+              >
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs text-muted-foreground">
+                {t("parity:cycles.scope")}
+              </div>
+              <div className="mt-1 text-base font-medium tabular-nums">
+                {new Intl.NumberFormat(i18n.language).format(totals.scopeCount)}
+              </div>
+              {cycle.settings.estimateScale !== "none" && (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {t("parity:cycles.totalPoints", {
+                    count: totals.scopePoints,
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs text-muted-foreground">
+                {cycle.summary
+                  ? t("parity:cycles.rolledOver")
+                  : t("parity:cycles.remaining")}
+              </div>
+              <div className="mt-1 text-base font-medium tabular-nums">
+                {new Intl.NumberFormat(i18n.language).format(
+                  cycle.summary?.rolledOverCount ??
+                    Math.max(0, totals.scopeCount - totals.completedCount),
+                )}
+              </div>
+              {cycle.phase === "current" && (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {t("parity:cycles.daysLeft", {
+                    count: daysLeft(cycle.endsAt, cycle.settings.timeZone),
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </header>
-      <BurndownChart cycle={cycle} />
-      <CycleTaskList
-        cycleId={cycle.id}
-        workspaceId={workspaceId}
-        settings={cycle.settings}
-      />
+        </header>
+        <BurndownChart cycle={cycle} />
+      </aside>
       {editing && (
         <CycleEditor cycle={cycle} onClose={() => setEditing(false)} />
       )}

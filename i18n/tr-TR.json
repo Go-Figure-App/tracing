@@ -5542,7 +5542,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "Gruplama yok",
+			"searchProjects": "Proje ara",
+			"searchInitiatives": "Girişim ara",
+			"allInitiatives": "Tüm girişimler",
+			"properties": "Özellikler"
 		},
 		"roadmap": {
 			"title": "Roadmap",

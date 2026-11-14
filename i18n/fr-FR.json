@@ -5635,7 +5635,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "Aucun regroupement",
+			"searchProjects": "Rechercher des projets",
+			"searchInitiatives": "Rechercher des initiatives",
+			"allInitiatives": "Toutes les initiatives",
+			"properties": "Propriétés"
 		},
 		"roadmap": {
 			"title": "Roadmap",

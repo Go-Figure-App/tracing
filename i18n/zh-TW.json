@@ -5450,7 +5450,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "不分組",
+			"searchProjects": "搜尋專案",
+			"searchInitiatives": "搜尋計畫",
+			"allInitiatives": "所有計畫",
+			"properties": "屬性"
 		},
 		"roadmap": {
 			"title": "Roadmap",

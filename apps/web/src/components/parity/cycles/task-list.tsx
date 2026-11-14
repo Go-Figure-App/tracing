@@ -2,6 +2,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { PlanningStatusIcon } from "../planning/status-icon";
+import { getPriorityIcon } from "@/lib/priority";
 import { Button } from "@/components/ui/button";
 import {
   getCycleTasks,
@@ -74,10 +76,15 @@ export function CycleTaskList({
         </p>
       )}
       {groups.map((group) => (
-        <div key={group.id} className="overflow-hidden rounded-lg border">
-          <h3 className="flex gap-2 bg-muted/40 px-4 py-2 text-xs font-medium">
+        <div key={group.id} className="overflow-hidden">
+          <h3 className="flex gap-2 rounded-md bg-muted/50 px-3 py-2 text-xs font-medium">
             {group.name}
             <span className="text-muted-foreground">{group.tasks.length}</span>
+            {groupBy === "state" && (
+              <span className="ml-auto truncate font-normal text-muted-foreground">
+                {group.tasks[0]?.projectName}
+              </span>
+            )}
           </h3>
           {group.tasks.map((task) => (
             <Link
@@ -88,15 +95,19 @@ export function CycleTaskList({
                 projectId: task.projectId,
                 taskId: task.id,
               }}
-              className="flex min-h-11 items-center gap-3 border-t px-4 py-2 text-sm hover:bg-accent focus-visible:bg-accent"
+              className="flex min-h-10 items-center gap-2.5 border-b border-border/30 px-3 py-2 text-[13px] outline-none hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
+              <span title={getPriorityLabel(task.priority)}>
+                <span aria-hidden="true">{getPriorityIcon(task.priority)}</span>
+                <span className="sr-only">
+                  {getPriorityLabel(task.priority)}
+                </span>
+              </span>
               <span className="w-20 shrink-0 truncate text-xs text-muted-foreground">{`${task.projectSlug.toUpperCase()}-${task.number ?? ""}`}</span>
+              <PlanningStatusIcon status={task.category} />
               <span className="min-w-0 flex-1 truncate">{task.title}</span>
               <span className="hidden max-w-32 truncate text-xs text-muted-foreground sm:block">
                 {task.assigneeName ?? t("parity:cycles.unassigned")}
-              </span>
-              <span className="hidden text-xs text-muted-foreground md:block">
-                {getPriorityLabel(task.priority)}
               </span>
               {settings.estimateScale !== "none" && task.estimate !== null && (
                 <span className="min-w-5 text-right text-xs tabular-nums text-muted-foreground">

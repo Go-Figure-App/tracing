@@ -205,7 +205,13 @@ test("initiatives link projects, roll up progress, post updates and restore arch
   ).toBeVisible();
   await expect(
     page.getByText("1 of 2 issues completed", { exact: true }),
-  ).toHaveCount(2);
+  ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Launch readiness" })
+      .getByRole("progressbar"),
+  ).toHaveAttribute("aria-valuenow", "50");
   await page
     .getByRole("combobox", { name: "Health", exact: true })
     .selectOption("off_track");

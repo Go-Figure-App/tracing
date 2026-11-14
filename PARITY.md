@@ -650,3 +650,23 @@ the runtime scripts. Existing Helm releases must preserve selectors, PVCs and
 credentials using the documented name overrides. CLI/MCP/importer setup docs
 use source builds because no Tracing registry artifacts have been published;
 upstream drim and analytics are not presented as Tracing services.
+
+## Planning UI comparison — November 2026
+
+This UI-only pass uses the signed-in Go Figure Linear web application and the actual Linear iOS app on the maintainer's mirrored iPhone. Linear was read-only; mutations were exercised in a disposable local Tracing workspace. Existing production/imported records, planning semantics, permission checks and chart history are unchanged.
+
+| Surface | Observed reference | Implemented web change |
+| --- | --- | --- |
+| Projects | Compact aligned rows; display menu with grouping, ordering and properties; overview/issues navigation | One aligned table, status and priority glyphs, name/slug/lead search, status filter, grouping by status or lead, ordering and property visibility. Collection controls load all authorized pages before reporting an empty result. |
+| Project overview | Title and description in the main column, compact metadata, initiative links, milestones, updates and supporting progress | Narrower properties rail, shared Overview/Issues navigation, links back to authorized initiatives via the existing roadmap endpoint, simpler milestone rows. |
+| Initiatives | Active/planned/all views; compact collection; overview followed by projects grouped by status | Status views and search, denser list, consistent detail hierarchy, grouped shared project table and retained add/remove actions. Reordering stays available only on the complete unfiltered collection. |
+| Cycles | Web issue list beside dates, chart and statistics; filter/display controls. Native cycle detail opens into grouped issues. | Issues occupy the main column; dates, progress and genuine burndown history move to a supporting rail. Compact navigation, rows and a filter popover with active count and clear action. Narrow layouts stack the summary above issues. |
+| Native reference | Grouped project rows; project Overview/Activity/Issues tabs; wrapping property chips; status selection sheet; initiative Overview/Activity/Projects; current/upcoming/past cycle list | Mobile implementation follows in a separate focused change. |
+
+Reference coverage: Linear web project collection/display menu, project overview, initiative list/detail, cycle list/detail/display menu; Linear iOS project list/overview/issues, status picker without selection, initiative overview/projects, teams/cycles list, and Cycle 14 issue list. The maintainer demonstrated the last cycle screen when Mirroring clicks stopped working. Installed Tracing home was captured on the same physical phone. Native dark appearance, swipe-back, creation submission, restricted records and mutation outcomes were **not** observed in Linear. Those are validation/implementation choices, not reference claims.
+
+Deliberate differences: Tracing retains its branding, board/backlog views, update editor, existing permission-gated property dialogs and extra cycle statistics. Linear's manual project order, project resource model, capacity forecast and unavailable historical chart points are not fabricated. New project display settings are local to the mounted view. Project-to-initiative links require the roadmap feature and disappear on failed authorization/refetch.
+
+Shared edits in this web slice: five copy keys in `i18n/en-US.json`, with translations in the other 20 catalogs; no shared application modules, API routes or schemas changed. Parity components and their behavioral tests stay within the fork boundary. Local comparison screenshots are retained in `../tracing-ui-evidence/` (reference, baseline and updated images); no private Linear screenshots are published to the repository.
+
+Web validation for this slice: all 2,055 web unit/component tests passed; the final planning/cycle subset passed 35 tests after chart sizing adjustments. Repository lint/format, repository type checks, locale synchronization, production web compilation and OpenAPI consistency passed. The browser exercised search/status/group/order, Escape dismissal, property save and reversal, project-to-initiative navigation, linked-project removal/addition with progress recalculation, cycle filters/clear/grouping, issue navigation, and cycle unassign/reassign on disposable records. Desktop comparisons use 1440×1000; the responsive cycle view was checked at 430×932 and both web appearances were observed. Production release verification is recorded after the final merged revision is deployed.

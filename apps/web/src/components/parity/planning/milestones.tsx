@@ -83,8 +83,11 @@ export function Milestones({
         </p>
       )}
       {milestones.map((milestone, index) => (
-        <article key={milestone.id} className="space-y-3 rounded-xl border p-4">
-          <div className="flex items-center justify-between gap-2">
+        <article
+          key={milestone.id}
+          className="space-y-3 border-b border-border/60 py-4 last:border-0"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-sm font-medium">{milestone.name}</h3>
               <p className="mt-1 text-xs text-muted-foreground">

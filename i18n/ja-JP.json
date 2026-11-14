@@ -5450,7 +5450,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "グループ化なし",
+			"searchProjects": "プロジェクトを検索",
+			"searchInitiatives": "イニシアチブを検索",
+			"allInitiatives": "すべてのイニシアチブ",
+			"properties": "プロパティ"
 		},
 		"roadmap": {
 			"title": "Roadmap",

@@ -11,6 +11,22 @@ export function ProgressMeter({
 }) {
   const { t } = useTranslation();
   const percent = progress.pointsPercent ?? progress.percent;
+  if (compact)
+    return (
+      <div
+        className="flex min-w-28 items-center gap-3"
+        title={t("parity:planning.completed", progress)}
+      >
+        <Progress
+          value={percent}
+          aria-label={t("parity:planning.progress")}
+          className="h-1 w-16"
+        />
+        <span className="text-xs tabular-nums text-muted-foreground">
+          {percent}%
+        </span>
+      </div>
+    );
   return (
     <div className="min-w-28 space-y-2">
       <div className="flex items-center justify-between gap-3 text-xs tabular-nums">

@@ -5450,7 +5450,12 @@
 			"priorityMedium": "Medium",
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
-			"newProject": "New project"
+			"newProject": "New project",
+			"noGrouping": "Không nhóm",
+			"searchProjects": "Tìm kiếm dự án",
+			"searchInitiatives": "Tìm kiếm sáng kiến",
+			"allInitiatives": "Tất cả sáng kiến",
+			"properties": "Thuộc tính"
 		},
 		"roadmap": {
 			"title": "Roadmap",

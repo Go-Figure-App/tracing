@@ -127,6 +127,13 @@ it("enables reordering only after all pages are loaded and submits the new order
   });
   const first = { items: [item("first")], hasMore: true, page: 1, pageSize: 1 };
   client.setQueryData(key, { pages: [first], pageParams: [1] });
+  let resolvePage!: (page: Awaited<ReturnType<typeof getInitiatives>>) => void;
+  vi.mocked(getInitiatives).mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        resolvePage = resolve;
+      }),
+  );
   render(
     <QueryClientProvider client={client}>
       <InitiativesPage workspaceId="workspace" />
@@ -135,15 +142,30 @@ it("enables reordering only after all pages are loaded and submits the new order
   expect(
     screen.queryByRole("button", { name: "parity:planning.moveUp" }),
   ).not.toBeInTheDocument();
+  await waitFor(() =>
+    expect(getInitiatives).toHaveBeenCalledWith("workspace", 2, false),
+  );
   await act(async () => {
-    client.setQueryData(key, {
-      pages: [
-        first,
-        { items: [item("second")], hasMore: false, page: 2, pageSize: 1 },
-      ],
-      pageParams: [1, 2],
-    });
+    resolvePage({
+      items: [item("second")],
+      hasMore: false,
+      page: 2,
+      pageSize: 1,
+    } as Awaited<ReturnType<typeof getInitiatives>>);
   });
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "parity:planning.searchInitiatives" }),
+    { target: { value: "second" } },
+  );
+  expect(screen.queryByText("first")).not.toBeInTheDocument();
+  expect(screen.getByText("second")).toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "parity:planning.moveUp" }),
+  ).not.toBeInTheDocument();
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "parity:planning.searchInitiatives" }),
+    { target: { value: "" } },
+  );
   const moveUp = await screen.findAllByRole("button", {
     name: "parity:planning.moveUp",
   });
