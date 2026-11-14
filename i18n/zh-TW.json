@@ -5451,11 +5451,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "不分組",
+			"searchProjects": "搜尋專案",
+			"searchInitiatives": "搜尋計畫",
+			"allInitiatives": "所有計畫",
+			"properties": "屬性"
 		},
 		"roadmap": {
 			"title": "Roadmap",

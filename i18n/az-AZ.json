@@ -5543,11 +5543,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "Qruplaşdırma yoxdur",
+			"searchProjects": "Layihələri axtar",
+			"searchInitiatives": "Təşəbbüsləri axtar",
+			"allInitiatives": "Bütün təşəbbüslər",
+			"properties": "Xüsusiyyətlər"
 		},
 		"roadmap": {
 			"title": "Roadmap",

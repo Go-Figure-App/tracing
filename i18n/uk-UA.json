@@ -5729,11 +5729,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "Без групування",
+			"searchProjects": "Пошук проєктів",
+			"searchInitiatives": "Пошук ініціатив",
+			"allInitiatives": "Усі ініціативи",
+			"properties": "Властивості"
 		},
 		"roadmap": {
 			"title": "Roadmap",

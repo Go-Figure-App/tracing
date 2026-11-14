@@ -5729,11 +5729,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "Bez grupowania",
+			"searchProjects": "Szukaj projektów",
+			"searchInitiatives": "Szukaj inicjatyw",
+			"allInitiatives": "Wszystkie inicjatywy",
+			"properties": "Właściwości"
 		},
 		"roadmap": {
 			"title": "Roadmap",

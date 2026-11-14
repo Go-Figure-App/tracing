@@ -5543,11 +5543,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "Geen groepering",
+			"searchProjects": "Projecten zoeken",
+			"searchInitiatives": "Initiatieven zoeken",
+			"allInitiatives": "Alle initiatieven",
+			"properties": "Eigenschappen"
 		},
 		"roadmap": {
 			"title": "Roadmap",

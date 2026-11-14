@@ -5451,11 +5451,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "그룹화 없음",
+			"searchProjects": "프로젝트 검색",
+			"searchInitiatives": "이니셔티브 검색",
+			"allInitiatives": "모든 이니셔티브",
+			"properties": "속성"
 		},
 		"roadmap": {
 			"title": "Roadmap",

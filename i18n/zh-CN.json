@@ -5451,11 +5451,11 @@
 			"priorityHigh": "High",
 			"priorityUrgent": "Urgent",
 			"newProject": "New project",
-			"noGrouping": "No grouping",
-			"searchProjects": "Search projects…",
-			"searchInitiatives": "Search initiatives…",
-			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"noGrouping": "不分组",
+			"searchProjects": "搜索项目",
+			"searchInitiatives": "搜索计划",
+			"allInitiatives": "所有计划",
+			"properties": "属性"
 		},
 		"roadmap": {
 			"title": "Roadmap",

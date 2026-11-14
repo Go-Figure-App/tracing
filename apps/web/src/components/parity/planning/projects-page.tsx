@@ -1,7 +1,7 @@
 import { uniquePageItems } from "./unique-page-items";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Plus, Search } from "lucide-react";
+import { Import, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
@@ -61,9 +61,15 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
           {canImport && (
             <Button
               variant="ghost"
+              size="sm"
+              aria-label={t("settings:workspaceImport.entry.projectsEmpty")}
+              title={t("settings:workspaceImport.entry.projectsEmpty")}
               render={<Link to="/dashboard/settings/workspace/import" />}
             >
-              {t("settings:workspaceImport.entry.projectsEmpty")}
+              <Import aria-hidden="true" className="size-4 sm:hidden" />
+              <span className="hidden sm:inline">
+                {t("settings:workspaceImport.entry.projectsEmpty")}
+              </span>
             </Button>
           )}
           {canCreateProjects() && (

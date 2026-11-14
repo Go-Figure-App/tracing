@@ -97,11 +97,11 @@ export function CycleTaskList({
               }}
               className="flex min-h-10 items-center gap-2.5 border-b border-border/30 px-3 py-2 text-[13px] outline-none hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
-              <span
-                title={getPriorityLabel(task.priority)}
-                aria-label={getPriorityLabel(task.priority)}
-              >
-                {getPriorityIcon(task.priority)}
+              <span title={getPriorityLabel(task.priority)}>
+                <span aria-hidden="true">{getPriorityIcon(task.priority)}</span>
+                <span className="sr-only">
+                  {getPriorityLabel(task.priority)}
+                </span>
               </span>
               <span className="w-20 shrink-0 truncate text-xs text-muted-foreground">{`${task.projectSlug.toUpperCase()}-${task.number ?? ""}`}</span>
               <PlanningStatusIcon status={task.category} />
