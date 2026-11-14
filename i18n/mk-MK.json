@@ -5301,7 +5301,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Пребарај проекти",
+				"searchInitiatives": "Пребарај иницијативи",
+				"all": "Сите",
+				"sortProjects": "Подреди проекти",
+				"filters": "Филтри",
+				"clearFilters": "Исчисти филтри"
 			},
 			"roadmap": {
 				"title": "Roadmap",

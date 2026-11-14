@@ -278,13 +278,31 @@ export function HomeTabView({
       <Section
         title={t("mobile:home.projects")}
         aside={
-          <IconButton
-            label={t("mobile:home.newProject")}
-            size={28}
-            onPress={() => setCreating(true)}
-          >
-            <Plus size={18} color={c.muted} strokeWidth={2} />
-          </IconButton>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            {planning && (
+              <Touch
+                accessibilityRole="button"
+                onPress={() =>
+                  router.push({
+                    pathname: "/projects",
+                    params: { workspaceId: workspace.id },
+                  })
+                }
+                style={{ minHeight: 44, justifyContent: "center" }}
+              >
+                <Txt variant="meta" tone="muted">
+                  {t("mobile:home.viewAll")}
+                </Txt>
+              </Touch>
+            )}
+            <IconButton
+              label={t("mobile:home.newProject")}
+              size={28}
+              onPress={() => setCreating(true)}
+            >
+              <Plus size={18} color={c.muted} strokeWidth={2} />
+            </IconButton>
+          </View>
         }
       >
         {projects.isLoading ? (

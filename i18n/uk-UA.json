@@ -5485,7 +5485,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Пошук проєктів",
+				"searchInitiatives": "Пошук ініціатив",
+				"all": "Усі",
+				"sortProjects": "Сортувати проєкти",
+				"filters": "Фільтри",
+				"clearFilters": "Скинути фільтри"
 			},
 			"roadmap": {
 				"title": "Roadmap",

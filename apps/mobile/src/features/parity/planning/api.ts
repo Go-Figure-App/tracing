@@ -9,12 +9,18 @@ import type {
   ParentType,
   PlanInput,
   ProjectPlan,
+  ProjectSummary,
   StatusUpdate,
 } from "./types";
 
 const root = "api/parity";
 const part = encodeURIComponent;
 export const planningApi = {
+  projects: (workspaceId: string, page = 1) =>
+    request<Page<ProjectSummary>>(
+      `${root}/project-plan/workspace/${part(workspaceId)}`,
+      { query: { page, pageSize: 100 } },
+    ),
   project: (id: string) =>
     request<ProjectPlan>(`${root}/project-plan/${part(id)}`),
   updateProject: (id: string, body: PlanInput) =>
@@ -46,6 +52,15 @@ export const planningApi = {
     }),
   initiative: (id: string) =>
     request<InitiativeDetail>(`${root}/initiative/item/${part(id)}`),
+  linkProject: (id: string, projectId: string) =>
+    request(`${root}/initiative/item/${part(id)}/project/${part(projectId)}`, {
+      method: "POST",
+      body: {},
+    }),
+  unlinkProject: (id: string, projectId: string) =>
+    request(`${root}/initiative/item/${part(id)}/project/${part(projectId)}`, {
+      method: "DELETE",
+    }),
   createInitiative: (workspaceId: string, body: InitiativeInput) =>
     request<Initiative>(`${root}/initiative/${part(workspaceId)}`, {
       method: "POST",

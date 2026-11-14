@@ -2,28 +2,36 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList } from "react-native";
+import { CircleDashed, ChevronRight } from "lucide-react-native";
+import { SectionList, View } from "react-native";
 import {
   EmptyState,
   ErrorState,
   Loading,
   PageHeader,
   Screen,
+  useBottomInset,
 } from "@/components/screen";
 import { Txt } from "@/components/text";
-import { Button, Group, Segmented, Touch } from "@/components/ui";
+import { Button, Touch } from "@/components/ui";
 import { userMessage } from "@/lib/api/client";
 import { usePlanningEnabled } from "../planning/queries";
 import { uniquePageItems } from "../planning/unique-page-items";
 import { cyclesApi } from "./api";
-import { CycleProgress } from "./progress";
+import { PlanningTabs } from "../planning/planning-tabs";
+import { ListGroupHeader } from "@/components/rows";
+import { currentLocale } from "@/lib/i18n";
+import { useColors } from "@/theme";
+import { completion } from "./chart";
 import type { CyclePhase } from "./types";
 import { useCycleFocus } from "./queries";
 
 export function CycleList({ workspaceId }: { workspaceId: string }) {
   const { t } = useTranslation(["mobile"]);
+  const c = useColors();
+  const bottom = useBottomInset(24);
   const enabled = usePlanningEnabled("cycles");
-  const [phase, setPhase] = useState<CyclePhase>("current");
+  const [phase, setPhase] = useState<CyclePhase | "all">("all");
   const query = useInfiniteQuery({
     queryKey: ["parity", "cycles", workspaceId, phase],
     queryFn: ({ pageParam }) => cyclesApi.list(workspaceId, phase, pageParam),
@@ -34,19 +42,36 @@ export function CycleList({ workspaceId }: { workspaceId: string }) {
   const items = query.isError ? [] : uniquePageItems(query.data?.pages);
   useCycleFocus(query.refetch, enabled && Boolean(workspaceId));
   const settings = query.data?.pages[0]?.settings;
+  const sections = (["current", "upcoming", "past"] as const)
+    .map((value) => ({
+      key: value,
+      title: t(`mobile:parity.cycles.${value}`),
+      data: items.filter((item) => item.phase === value),
+    }))
+    .filter((section) => section.data.length);
+  const date = new Intl.DateTimeFormat(currentLocale(), {
+    month: "short",
+    day: "numeric",
+    timeZone: settings?.timeZone ?? "UTC",
+  });
   return (
-    <Screen>
+    <Screen surface>
       <PageHeader title={t("mobile:parity.cycles.title")} />
       {!enabled ? (
         <Txt center>{t("mobile:parity.planning.unavailable")}</Txt>
       ) : (
         <>
-          <Segmented
+          <PlanningTabs
             value={phase}
             onChange={setPhase}
-            style={{ marginHorizontal: 20, marginBottom: 16 }}
-            options={(["current", "upcoming", "past"] as const).map(
-              (value) => ({ value, label: t(`mobile:parity.cycles.${value}`) }),
+            options={(["all", "current", "upcoming", "past"] as const).map(
+              (value) => ({
+                value,
+                label:
+                  value === "all"
+                    ? t("mobile:parity.planning.all")
+                    : t(`mobile:parity.cycles.${value}`),
+              }),
             )}
           />
           {query.isPending ? (
@@ -57,15 +82,20 @@ export function CycleList({ workspaceId }: { workspaceId: string }) {
               onRetry={query.refetch}
             />
           ) : (
-            <FlatList
-              data={items}
+            <SectionList
+              sections={sections}
+              stickySectionHeadersEnabled={false}
+              renderSectionHeader={({ section }) => (
+                <ListGroupHeader
+                  title={section.title}
+                  count={section.data.length}
+                />
+              )}
               keyExtractor={(item) => item.id}
               refreshing={query.isRefetching}
               onRefresh={() => void query.refetch()}
               contentContainerStyle={{
-                paddingHorizontal: 20,
-                gap: 12,
-                paddingBottom: 40,
+                paddingBottom: bottom + 20,
               }}
               ListEmptyComponent={
                 <EmptyState
@@ -82,28 +112,54 @@ export function CycleList({ workspaceId }: { workspaceId: string }) {
                 />
               }
               renderItem={({ item }) => (
-                <Group>
-                  <Touch
-                    accessibilityRole="button"
-                    onPress={() =>
-                      router.push({
-                        pathname: "/cycle/[cycleId]",
-                        params: { cycleId: item.id },
-                      })
-                    }
-                    style={{ padding: 16, gap: 12 }}
-                  >
-                    <Txt variant="section">
+                <Touch
+                  accessibilityRole="button"
+                  onPress={() =>
+                    router.push({
+                      pathname: "/cycle/[cycleId]",
+                      params: { cycleId: item.id },
+                    })
+                  }
+                  style={{
+                    paddingHorizontal: 20,
+                    paddingVertical: 16,
+                    minHeight: 72,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: c.divider,
+                  }}
+                >
+                  <CircleDashed
+                    size={20}
+                    color={item.phase === "current" ? c.warningFg : c.muted}
+                  />
+                  <View style={{ flex: 1, gap: 5 }}>
+                    <Txt variant="body" weight="medium" numberOfLines={2}>
                       {item.name ??
                         t("mobile:parity.cycles.number", {
                           number: item.number,
                         })}
                     </Txt>
-                    {settings && (
-                      <CycleProgress cycle={item} settings={settings} />
+                    <Txt variant="caption" tone="muted">
+                      {date.format(new Date(item.startsAt))} –{" "}
+                      {date.format(new Date(+new Date(item.endsAt) - 1))}
+                    </Txt>
+                  </View>
+                  <Txt variant="caption" tone="muted">
+                    {new Intl.NumberFormat(currentLocale(), {
+                      style: "percent",
+                      maximumFractionDigits: 0,
+                    }).format(
+                      completion(
+                        item.summary ?? item.progress,
+                        settings?.estimateScale !== "none",
+                      ) / 100,
                     )}
-                  </Touch>
-                </Group>
+                  </Txt>
+                  <ChevronRight size={16} color={c.faint} />
+                </Touch>
               )}
               ListFooterComponent={
                 query.hasNextPage ? (

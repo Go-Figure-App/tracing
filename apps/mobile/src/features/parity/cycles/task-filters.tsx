@@ -27,6 +27,10 @@ export function CycleTaskFiltersBar({
 }) {
   const { t } = useTranslation(["mobile"]);
   const c = useColors();
+  const [expanded, setExpanded] = useState(false);
+  const activeCount = Object.entries(filters).filter(
+    ([key, value]) => key !== "search" && Boolean(value),
+  ).length;
   const [picker, setPicker] = useState<Filter | null>(null);
   const projects = useQuery({
     queryKey: qk.projects(workspaceId),
@@ -103,47 +107,72 @@ export function CycleTaskFiltersBar({
           color: c.ink,
         }}
       />
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {(["projectId", "assigneeId", "category", "priority"] as const)
-          .filter((key) => !assignedOnly || key !== "assigneeId")
-          .map((key) => (
-            <Touch
-              key={key}
-              accessibilityRole="button"
-              accessibilityLabel={labels[key]}
-              onPress={() => setPicker(key)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                borderRadius: 8,
-                backgroundColor: filters[key] ? c.fillStrong : c.fill,
-              }}
-            >
-              <Txt variant="caption">
-                {filters[key]
-                  ? (options[key].find((item) => item.value === filters[key])
-                      ?.label ?? labels[key])
-                  : labels[key]}
-              </Txt>
-            </Touch>
-          ))}
-      </View>
-      <TextInput
-        accessibilityLabel={t("mobile:parity.cycles.label")}
-        placeholder={t("mobile:parity.cycles.labelPlaceholder")}
-        placeholderTextColor={c.faint}
-        value={filters.label ?? ""}
-        onChangeText={(label) =>
-          onChange({ ...filters, label: label || undefined })
-        }
-        maxLength={200}
-        style={{
-          padding: 12,
-          borderRadius: 8,
-          backgroundColor: c.fill,
-          color: c.ink,
-        }}
-      />
+      <Touch
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded(!expanded)}
+        style={{ minHeight: 44, justifyContent: "center" }}
+      >
+        <Txt variant="meta">
+          {t("mobile:parity.planning.filters")}
+          {activeCount ? ` (${activeCount})` : ""}
+        </Txt>
+      </Touch>
+      {expanded && (
+        <>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+            {(["projectId", "assigneeId", "category", "priority"] as const)
+              .filter((key) => !assignedOnly || key !== "assigneeId")
+              .map((key) => (
+                <Touch
+                  key={key}
+                  accessibilityRole="button"
+                  accessibilityLabel={labels[key]}
+                  onPress={() => setPicker(key)}
+                  style={{
+                    paddingHorizontal: 12,
+                    minHeight: 44,
+                    justifyContent: "center",
+                    paddingVertical: 8,
+                    borderRadius: 8,
+                    backgroundColor: filters[key] ? c.fillStrong : c.fill,
+                  }}
+                >
+                  <Txt variant="caption">
+                    {filters[key]
+                      ? (options[key].find(
+                          (item) => item.value === filters[key],
+                        )?.label ?? labels[key])
+                      : labels[key]}
+                  </Txt>
+                </Touch>
+              ))}
+          </View>
+          <TextInput
+            accessibilityLabel={t("mobile:parity.cycles.label")}
+            placeholder={t("mobile:parity.cycles.labelPlaceholder")}
+            placeholderTextColor={c.faint}
+            value={filters.label ?? ""}
+            onChangeText={(label) =>
+              onChange({ ...filters, label: label || undefined })
+            }
+            maxLength={200}
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              backgroundColor: c.fill,
+              color: c.ink,
+            }}
+          />
+          {activeCount > 0 && (
+            <Button
+              kind="ghost"
+              label={t("mobile:parity.planning.clearFilters")}
+              onPress={() => onChange({ search: filters.search })}
+            />
+          )}
+        </>
+      )}
       {picker && (error || loading) ? (
         <Sheet visible title={labels[picker]} onClose={() => setPicker(null)}>
           {error ? (

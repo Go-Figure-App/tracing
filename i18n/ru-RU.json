@@ -5537,7 +5537,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Поиск проектов",
+				"searchInitiatives": "Поиск инициатив",
+				"all": "Все",
+				"sortProjects": "Сортировать проекты",
+				"filters": "Фильтры",
+				"clearFilters": "Сбросить фильтры"
 			},
 			"roadmap": {
 				"title": "Roadmap",

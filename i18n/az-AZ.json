@@ -5301,7 +5301,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Layihələri axtar",
+				"searchInitiatives": "Təşəbbüsləri axtar",
+				"all": "Hamısı",
+				"sortProjects": "Layihələri sırala",
+				"filters": "Filtrlər",
+				"clearFilters": "Filtrləri təmizlə"
 			},
 			"roadmap": {
 				"title": "Roadmap",

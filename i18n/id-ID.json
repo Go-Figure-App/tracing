@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Cari proyek",
+				"searchInitiatives": "Cari inisiatif",
+				"all": "Semua",
+				"sortProjects": "Urutkan proyek",
+				"filters": "Filter",
+				"clearFilters": "Hapus filter"
 			},
 			"roadmap": {
 				"title": "Roadmap",

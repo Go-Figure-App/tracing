@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "프로젝트 검색",
+				"searchInitiatives": "이니셔티브 검색",
+				"all": "전체",
+				"sortProjects": "프로젝트 정렬",
+				"filters": "필터",
+				"clearFilters": "필터 지우기"
 			},
 			"roadmap": {
 				"title": "Roadmap",

@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import {
   Activity,
+  Folder,
   LayoutList,
   Flag,
   GanttChart,
@@ -24,117 +25,92 @@ export function MoreTab({
 }) {
   const { t } = useTranslation(["mobile"]);
   const c = useColors();
+  const projects = usePlanningEnabled();
   const initiatives = usePlanningEnabled("initiatives");
   const roadmap = usePlanningEnabled("roadmap");
   const cycles = usePlanningEnabled("cycles");
   const insights = usePlanningEnabled("insights");
   const views = usePlanningEnabled("views");
+  const entries = [
+    {
+      id: "projects",
+      enabled: projects,
+      label: t("mobile:home.projects"),
+      Icon: Folder,
+      onPress: () =>
+        router.push({ pathname: "/projects", params: { workspaceId } }),
+    },
+    {
+      id: "initiatives",
+      enabled: initiatives,
+      label: t("mobile:parity.planning.initiatives"),
+      Icon: Flag,
+      onPress: () =>
+        router.push({ pathname: "/initiatives", params: { workspaceId } }),
+    },
+    {
+      id: "cycles",
+      enabled: cycles,
+      label: t("mobile:parity.cycles.title"),
+      Icon: CircleDashed,
+      onPress: () =>
+        router.push({ pathname: "/cycles", params: { workspaceId } }),
+    },
+    {
+      id: "roadmap",
+      enabled: roadmap,
+      label: t("mobile:parity.roadmap.title"),
+      Icon: GanttChart,
+      onPress: () =>
+        router.push({ pathname: "/roadmap", params: { workspaceId } }),
+    },
+    {
+      id: "views",
+      enabled: views,
+      label: t("mobile:parity.views.title"),
+      Icon: LayoutList,
+      onPress: () =>
+        router.push({ pathname: "/views", params: { workspaceId } }),
+    },
+    {
+      id: "insights",
+      enabled: insights,
+      label: t("mobile:parity.insights.title"),
+      Icon: ChartNoAxesCombined,
+      onPress: () =>
+        router.push({ pathname: "/insights", params: { workspaceId } }),
+    },
+    {
+      id: "activity",
+      enabled: true,
+      label: t("mobile:nav.activity"),
+      Icon: Activity,
+      onPress: onActivity,
+    },
+  ];
   return (
     <Scroll>
       <PageHeader title={t("mobile:parity.planning.more")} back={false} />
       <View style={{ paddingHorizontal: 20 }}>
         <Group>
-          {views && (
-            <Touch
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({ pathname: "/views", params: { workspaceId } })
-              }
-              style={{
-                padding: 18,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <LayoutList size={20} color={c.ink2} />
-              <Txt>{t("mobile:parity.views.title")}</Txt>
-            </Touch>
-          )}
-          {insights && (
-            <Touch
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({ pathname: "/insights", params: { workspaceId } })
-              }
-              style={{
-                padding: 18,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <ChartNoAxesCombined size={20} color={c.ink2} />
-              <Txt>{t("mobile:parity.insights.title")}</Txt>
-            </Touch>
-          )}
-          {cycles && (
-            <Touch
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({ pathname: "/cycles", params: { workspaceId } })
-              }
-              style={{
-                padding: 18,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <CircleDashed size={20} color={c.ink2} />
-              <Txt>{t("mobile:parity.cycles.title")}</Txt>
-            </Touch>
-          )}
-          {roadmap && (
-            <Touch
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({ pathname: "/roadmap", params: { workspaceId } })
-              }
-              style={{
-                padding: 18,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <GanttChart size={20} color={c.ink2} />
-              <Txt>{t("mobile:parity.roadmap.title")}</Txt>
-            </Touch>
-          )}
-          <Touch
-            accessibilityRole="button"
-            onPress={onActivity}
-            style={{
-              padding: 18,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-            }}
-          >
-            <Activity size={20} color={c.ink2} />
-            <Txt>{t("mobile:nav.activity")}</Txt>
-          </Touch>
-          {initiatives && (
-            <Touch
-              accessibilityRole="button"
-              onPress={() =>
-                router.push({
-                  pathname: "/initiatives",
-                  params: { workspaceId },
-                })
-              }
-              style={{
-                padding: 18,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <Flag size={20} color={c.ink2} />
-              <Txt>{t("mobile:parity.planning.initiatives")}</Txt>
-            </Touch>
-          )}
+          {entries
+            .filter((entry) => entry.enabled)
+            .map(({ id, label, Icon, onPress }) => (
+              <Touch
+                key={id}
+                accessibilityRole="button"
+                onPress={onPress}
+                style={{
+                  padding: 18,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                }}
+              >
+                <Icon size={20} color={c.ink2} />
+                <Txt>{label}</Txt>
+              </Touch>
+            ))}
         </Group>
       </View>
     </Scroll>
