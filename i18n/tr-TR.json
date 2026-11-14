@@ -5301,7 +5301,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Proje ara",
+				"searchInitiatives": "Girişim ara",
+				"all": "Tümü",
+				"sortProjects": "Projeleri sırala",
+				"filters": "Filtreler",
+				"clearFilters": "Filtreleri temizle"
 			},
 			"roadmap": {
 				"title": "Roadmap",

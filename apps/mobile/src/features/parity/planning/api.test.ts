@@ -72,3 +72,21 @@ it("surfaces permission failures to the action error handler", async () => {
     planningApi.updateInitiative("id", { name: "Plan" }),
   ).rejects.toThrow("Forbidden");
 });
+
+it("loads project pages and links and unlinks projects with encoded identities", async () => {
+  await planningApi.projects("space/one", 3);
+  expect(request).toHaveBeenLastCalledWith(
+    "api/parity/project-plan/workspace/space%2Fone",
+    { query: { page: 3, pageSize: 100 } },
+  );
+  await planningApi.linkProject("goal/one", "project/one");
+  expect(request).toHaveBeenLastCalledWith(
+    "api/parity/initiative/item/goal%2Fone/project/project%2Fone",
+    { method: "POST", body: {} },
+  );
+  await planningApi.unlinkProject("goal/one", "project/one");
+  expect(request).toHaveBeenLastCalledWith(
+    "api/parity/initiative/item/goal%2Fone/project/project%2Fone",
+    { method: "DELETE" },
+  );
+});

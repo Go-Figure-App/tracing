@@ -5301,7 +5301,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "प्रोजेक्ट खोजें",
+				"searchInitiatives": "पहल खोजें",
+				"all": "सभी",
+				"sortProjects": "प्रोजेक्ट क्रमबद्ध करें",
+				"filters": "फ़िल्टर",
+				"clearFilters": "फ़िल्टर हटाएँ"
 			},
 			"roadmap": {
 				"title": "Roadmap",

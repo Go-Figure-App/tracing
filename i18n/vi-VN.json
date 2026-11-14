@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Tìm kiếm dự án",
+				"searchInitiatives": "Tìm kiếm sáng kiến",
+				"all": "Tất cả",
+				"sortProjects": "Sắp xếp dự án",
+				"filters": "Bộ lọc",
+				"clearFilters": "Xóa bộ lọc"
 			},
 			"roadmap": {
 				"title": "Roadmap",

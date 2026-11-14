@@ -3,14 +3,15 @@ import { router } from "expo-router";
 import { useState, type ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionList, View } from "react-native";
-import { ErrorState, Loading } from "@/components/screen";
+import { ErrorState, Loading, useBottomInset } from "@/components/screen";
 import { TaskRow, ListGroupHeader } from "@/components/rows";
 import { Txt } from "@/components/text";
-import { Button, Segmented } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { userMessage } from "@/lib/api/client";
 import { currentLocale } from "@/lib/i18n";
 import { ticketId } from "@/lib/format";
 import { uniquePageItems } from "../planning/unique-page-items";
+import { PlanningTabs } from "../planning/planning-tabs";
 import { cyclesApi } from "./api";
 import { estimateLabel } from "./estimates";
 import { groupCycleTasks, type CycleGroup } from "./group-tasks";
@@ -36,6 +37,7 @@ export function CycleTaskList({
   onRefresh?: () => void;
 }) {
   const { t } = useTranslation(["mobile"]);
+  const bottom = useBottomInset(24);
   const [groupBy, setGroupBy] = useState<CycleGroup>("state");
   const [filters, setFilters] = useState<CycleTaskFilters>({});
   const effective = { ...filters, ...(assigneeId ? { assigneeId } : {}) };
@@ -58,17 +60,23 @@ export function CycleTaskList({
       keyExtractor={(item) => item.id}
       stickySectionHeadersEnabled={false}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: bottom + 20 }}
       refreshing={refreshing || query.isRefetching}
       onRefresh={() => {
         void query.refetch();
         onRefresh?.();
       }}
       ListHeaderComponent={
-        <View style={{ paddingHorizontal: 20, gap: 20, paddingBottom: 16 }}>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            gap: 8,
+            paddingTop: 12,
+            paddingBottom: 12,
+          }}
+        >
           {header}
-          <Txt variant="section">{t("mobile:parity.cycles.tasks")}</Txt>
-          <Segmented
+          <PlanningTabs
             value={groupBy}
             onChange={setGroupBy}
             options={(["state", "assignee", "project"] as const).map(
@@ -105,6 +113,7 @@ export function CycleTaskList({
       renderItem={({ item }) => (
         <View>
           <TaskRow
+            compact
             title={item.title}
             ticket={ticketId(item.projectSlug, item.number)}
             project={groupBy === "project" ? null : item.projectName}

@@ -5301,7 +5301,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "Αναζήτηση έργων",
+				"searchInitiatives": "Αναζήτηση πρωτοβουλιών",
+				"all": "Όλα",
+				"sortProjects": "Ταξινόμηση έργων",
+				"filters": "Φίλτρα",
+				"clearFilters": "Εκκαθάριση φίλτρων"
 			},
 			"roadmap": {
 				"title": "Roadmap",

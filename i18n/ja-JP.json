@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "プロジェクトを検索",
+				"searchInitiatives": "イニシアチブを検索",
+				"all": "すべて",
+				"sortProjects": "プロジェクトを並べ替え",
+				"filters": "フィルター",
+				"clearFilters": "フィルターをクリア"
 			},
 			"roadmap": {
 				"title": "Roadmap",

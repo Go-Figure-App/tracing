@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "搜索项目",
+				"searchInitiatives": "搜索计划",
+				"all": "全部",
+				"sortProjects": "项目排序",
+				"filters": "筛选",
+				"clearFilters": "清除筛选"
 			},
 			"roadmap": {
 				"title": "Roadmap",

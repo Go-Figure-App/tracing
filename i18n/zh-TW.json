@@ -5209,7 +5209,13 @@
 				"priorityMedium": "Medium",
 				"priorityHigh": "High",
 				"priorityUrgent": "Urgent",
-				"newProject": "New project"
+				"newProject": "New project",
+				"searchProjects": "搜尋專案",
+				"searchInitiatives": "搜尋計畫",
+				"all": "全部",
+				"sortProjects": "專案排序",
+				"filters": "篩選",
+				"clearFilters": "清除篩選"
 			},
 			"roadmap": {
 				"title": "Roadmap",
