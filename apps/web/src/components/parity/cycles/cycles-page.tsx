@@ -54,14 +54,14 @@ export function CyclesPage({
     >
       <PageTitle title={t("parity:cycles.title")} />
       <div className="h-full overflow-y-auto">
-        <div className="mx-auto max-w-5xl space-y-7 p-5 sm:p-8">
+        <div className="space-y-4 px-4 py-2 sm:px-5">
           {!enabled ? (
             <p>{t("parity:planning.unavailable")}</p>
           ) : (
             <>
               <nav
                 aria-label={t("parity:cycles.title")}
-                className="flex gap-1 border-b pb-3"
+                className="flex gap-1 border-b border-border/60 pb-2"
               >
                 {(["current", "upcoming", "past"] as const).map((tab) => (
                   <Link
@@ -72,7 +72,7 @@ export function CyclesPage({
                     aria-current={
                       !cycleId && phase === tab ? "page" : undefined
                     }
-                    className={`rounded-md px-3 py-1.5 text-sm ${!cycleId && phase === tab ? "bg-accent font-medium" : "text-muted-foreground hover:bg-accent"}`}
+                    className={`rounded-full px-3 py-1.5 text-xs ${!cycleId && phase === tab ? "bg-accent font-medium" : "text-muted-foreground hover:bg-accent"}`}
                   >
                     {t(`parity:cycles.${tab}`)}
                   </Link>
@@ -110,7 +110,7 @@ export function CyclesPage({
                           : t("parity:cycles.noCycles")}
                     </div>
                   )}
-                  <div className="space-y-3">
+                  <div className="divide-y divide-border/50">
                     {items.map((cycle) => {
                       const totals = cycle.summary ?? cycle.progress;
                       const percent = completion(
@@ -126,7 +126,7 @@ export function CyclesPage({
                           key={cycle.id}
                           to="/dashboard/workspace/$workspaceId/cycles/$cycleId"
                           params={{ workspaceId, cycleId: cycle.id }}
-                          className="flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5 hover:bg-accent/30"
+                          className="flex min-h-20 flex-wrap items-center justify-between gap-4 px-5 py-4 outline-none hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <div>
                             <h2 className="font-medium">

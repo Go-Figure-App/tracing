@@ -1,8 +1,8 @@
 import { uniquePageItems } from "./unique-page-items";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
 import WorkspaceLayout from "@/components/common/workspace-layout";
@@ -14,21 +14,45 @@ import { useCanImport } from "@/hooks/use-can-import";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { projectStatuses, usePlanningLabels } from "./labels";
 import { ProjectsTable } from "./projects-table";
+import { ProjectDisplayOptions } from "./project-display-options";
+import {
+  projectColumns,
+  selectProjects,
+  type ProjectColumn,
+  type ProjectGrouping,
+  type ProjectOrder,
+} from "./project-collection";
 
 export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const labels = usePlanningLabels();
   const { canCreateProjects } = useWorkspacePermission();
   const { canImport } = useCanImport();
   const [creating, setCreating] = useState(false);
-  const [grouped, setGrouped] = useState(true);
+  const [groupBy, setGroupBy] = useState<ProjectGrouping>("none");
+  const [orderBy, setOrderBy] = useState<ProjectOrder>("name");
+  const [columns, setColumns] = useState<ProjectColumn[]>(projectColumns);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
   const query = useInfiniteQuery({
     queryKey: ["parity", "project-plans", workspaceId],
     initialPageParam: 1,
     queryFn: ({ pageParam }) => getProjectPlans(workspaceId, pageParam),
     getNextPageParam: (page) => (page.hasMore ? page.page + 1 : undefined),
   });
+  // Collection controls must include every authorized page, not only the first.
+  const { hasNextPage, isFetching, isError, fetchNextPage } = query;
+  useEffect(() => {
+    if (hasNextPage && !isFetching && !isError) void fetchNextPage();
+  }, [hasNextPage, isFetching, isError, fetchNextPage]);
   const projects = query.isError ? [] : uniquePageItems(query.data?.pages);
+  const visibleProjects = selectProjects(
+    projects,
+    search,
+    status,
+    orderBy,
+    i18n.language,
+  );
   return (
     <WorkspaceLayout
       title={t("parity:planning.projects")}
@@ -43,7 +67,7 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
             </Button>
           )}
           {canCreateProjects() && (
-            <Button size="sm" onClick={() => setCreating(true)}>
+            <Button variant="ghost" size="sm" onClick={() => setCreating(true)}>
               <Plus className="size-4" />
               {t("parity:planning.newProject")}
             </Button>
@@ -53,60 +77,81 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
     >
       <PageTitle title={t("parity:planning.projects")} />
       <TrialExpiredCallout workspaceId={workspaceId} className="m-4" />
-      <div className="h-full overflow-auto px-4 py-5 sm:px-7">
-        <label className="mb-5 flex items-center gap-2 text-xs text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={grouped}
-            onChange={(event) => setGrouped(event.target.checked)}
-          />
-          {t("parity:planning.groupByStatus")}
-        </label>
-        {query.isPending && <p role="status">{t("parity:planning.loading")}</p>}
-        {query.error && (
-          <div role="alert">
-            {query.error.message}
-            <Button variant="ghost" onClick={() => query.refetch()}>
-              {t("parity:planning.retry")}
-            </Button>
-          </div>
-        )}
-        {!query.isPending && !query.error && projects.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            {t("parity:planning.noProjects")}
-          </p>
-        )}
-        {grouped ? (
-          projectStatuses.map((status) => {
-            const group = projects.filter(
-              (project) => project.status === status,
-            );
-            return (
-              group.length > 0 && (
-                <section key={status} className="mb-7">
-                  <h2 className="mb-2 text-xs font-medium">
-                    {labels.status[status]}{" "}
-                    <span className="ml-1 text-muted-foreground">
-                      {group.length}
-                    </span>
-                  </h2>
-                  <ProjectsTable projects={group} />
-                </section>
-              )
-            );
-          })
-        ) : (
-          <ProjectsTable projects={projects} />
-        )}
-        {!query.isError && query.hasNextPage && (
-          <Button
-            variant="outline"
-            disabled={query.isFetchingNextPage}
-            onClick={() => query.fetchNextPage()}
+      <div className="flex h-full min-h-0 flex-col">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border/60 px-4 py-2">
+          <span className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium">
+            {t("parity:cycles.allProjects")}
+          </span>
+          <label className="ml-auto flex min-w-32 max-w-64 flex-1 items-center gap-2 rounded-md px-2 focus-within:ring-2 focus-within:ring-ring">
+            <Search
+              aria-hidden="true"
+              className="size-3.5 text-muted-foreground"
+            />
+            <input
+              aria-label={t("parity:planning.searchProjects")}
+              placeholder={t("parity:planning.searchProjects")}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="h-8 min-w-0 w-full bg-transparent text-xs outline-none"
+            />
+          </label>
+          <select
+            aria-label={t("parity:planning.status")}
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}
+            className="h-8 max-w-40 rounded-md border border-border/60 bg-background px-2 text-xs"
           >
-            {t("parity:planning.loadMore")}
-          </Button>
-        )}
+            <option value="">{t("parity:planning.allStatuses")}</option>
+            {projectStatuses.map((value) => (
+              <option key={value} value={value}>
+                {labels.status[value]}
+              </option>
+            ))}
+          </select>
+          <ProjectDisplayOptions
+            groupBy={groupBy}
+            setGroupBy={setGroupBy}
+            orderBy={orderBy}
+            setOrderBy={setOrderBy}
+            columns={columns}
+            setColumns={setColumns}
+          />
+        </div>
+        <div className="min-h-0 flex-1 overflow-auto py-1">
+          {query.isPending && (
+            <p role="status">{t("parity:planning.loading")}</p>
+          )}
+          {query.error && (
+            <div role="alert">
+              {query.error.message}
+              <Button variant="ghost" onClick={() => query.refetch()}>
+                {t("parity:planning.retry")}
+              </Button>
+            </div>
+          )}
+          {!query.isPending &&
+            !query.hasNextPage &&
+            !query.error &&
+            visibleProjects.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                {t("parity:planning.noProjects")}
+              </p>
+            )}
+          <ProjectsTable
+            projects={visibleProjects}
+            groupBy={groupBy}
+            columns={columns}
+          />
+          {!query.isError && query.hasNextPage && (
+            <Button
+              variant="outline"
+              disabled={query.isFetchingNextPage}
+              onClick={() => query.fetchNextPage()}
+            >
+              {t("parity:planning.loadMore")}
+            </Button>
+          )}
+        </div>
       </div>
       <CreateProjectModal
         open={creating}

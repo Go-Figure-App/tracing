@@ -96,7 +96,7 @@ it("keeps failed metadata out of filtered results and ignores saved filters when
   expect(result.current.matches({ id: "one" })).toBe(true);
 });
 
-it("keeps active project and assignee filters clearable without exposing failed metadata", () => {
+it("keeps active project and assignee filters clearable without exposing failed metadata", async () => {
   const filters = { projectId: "project", assigneeId: "member" };
   const setFilters = vi.fn();
   const bar = () => (
@@ -109,6 +109,10 @@ it("keeps active project and assignee filters clearable without exposing failed 
     />
   );
   const { rerender } = render(bar());
+  fireEvent.click(
+    screen.getByRole("button", { name: /common:actions.filter/ }),
+  );
+  await screen.findByRole("option", { name: "Project name" });
   expect(
     screen.getByRole("option", { name: "Project name" }),
   ).toBeInTheDocument();

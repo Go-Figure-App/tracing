@@ -16,7 +16,7 @@ export function ProjectPlanningNav({
     <Link
       to="/dashboard/workspace/$workspaceId/project/$projectId/overview"
       params={{ workspaceId, projectId }}
-      className="rounded-md px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent"
+      className="rounded-full px-3 py-1.5 text-xs text-muted-foreground outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
       activeProps={{ className: "bg-accent font-medium text-foreground" }}
     >
       {t("parity:planning.overview")}

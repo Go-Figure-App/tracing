@@ -7,7 +7,7 @@ export function BurndownChart({ cycle }: { cycle: CycleDetail }) {
   const { t, i18n } = useTranslation();
   const titleId = useId();
   const chart = burndown(cycle);
-  const x = (value: number) => 45 + value * 570;
+  const x = (value: number) => 32 + value * 276;
   const y = (value: number) => 170 - (value / chart.maximum) * 145;
   const points = chart.observed
     .map((row) => `${x(row.x)},${y(row.remaining)}`)
@@ -17,7 +17,7 @@ export function BurndownChart({ cycle }: { cycle: CycleDetail }) {
       value,
     );
   return (
-    <section className="rounded-xl border bg-card p-5">
+    <section className="space-y-3">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="text-sm font-medium">{t("parity:cycles.burndown")}</h2>
         <span className="text-xs text-muted-foreground">
@@ -27,17 +27,17 @@ export function BurndownChart({ cycle }: { cycle: CycleDetail }) {
         </span>
       </div>
       {!cycle.historyAvailable ? (
-        <p className="py-8 text-sm text-muted-foreground">
+        <p className="py-4 text-xs text-muted-foreground">
           {t("parity:cycles.historyUnavailable")}
         </p>
       ) : chart.observed.length === 0 ? (
-        <p className="py-8 text-sm text-muted-foreground">
+        <p className="py-4 text-xs text-muted-foreground">
           {t("parity:cycles.historyEmpty")}
         </p>
       ) : (
         <>
           <svg
-            viewBox="0 0 640 205"
+            viewBox="0 0 320 205"
             className="w-full"
             role="img"
             aria-labelledby={titleId}
@@ -46,19 +46,19 @@ export function BurndownChart({ cycle }: { cycle: CycleDetail }) {
             {[0, 0.5, 1].map((ratio) => (
               <g key={ratio}>
                 <line
-                  x1={45}
-                  x2={615}
+                  x1={32}
+                  x2={308}
                   y1={y(chart.maximum * ratio)}
                   y2={y(chart.maximum * ratio)}
                   stroke="currentColor"
                   className="text-border"
                 />
                 <text
-                  x={35}
+                  x={24}
                   y={y(chart.maximum * ratio) + 4}
                   textAnchor="end"
                   fill="currentColor"
-                  className="text-[10px] text-muted-foreground"
+                  className="text-[11px] text-muted-foreground"
                 >
                   {number(chart.maximum * ratio)}
                 </text>
@@ -94,19 +94,19 @@ export function BurndownChart({ cycle }: { cycle: CycleDetail }) {
               </circle>
             ))}
             <text
-              x={45}
+              x={32}
               y={195}
               fill="currentColor"
-              className="text-[10px] text-muted-foreground"
+              className="text-[11px] text-muted-foreground"
             >
               {formatCalendarDay(chart.startDay, i18n.language)}
             </text>
             <text
-              x={615}
+              x={308}
               y={195}
               textAnchor="end"
               fill="currentColor"
-              className="text-[10px] text-muted-foreground"
+              className="text-[11px] text-muted-foreground"
             >
               {formatCalendarDay(chart.endDay, i18n.language)}
             </text>
