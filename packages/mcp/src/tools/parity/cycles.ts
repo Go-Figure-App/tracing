@@ -1,28 +1,11 @@
 import { z } from "zod";
-import { errorResult, textResult } from "../../utils/mcp-result.js";
 import type { ToolClient, ToolRegistrar } from "../register.js";
+import { parityTool } from "./register-tool.js";
+import { hasChanges, id, page, queryString } from "./schemas.js";
 
 // Shared by the stdio package and the authenticated HTTP MCP endpoint.
 export function registerCycleTools(server: ToolRegistrar, client: ToolClient) {
-  const id = z.string().trim().min(1).max(128);
-  function register<S extends z.ZodObject>(
-    name: string,
-    description: string,
-    inputSchema: S,
-    run: (input: z.output<S>) => Promise<unknown>,
-  ) {
-    server.registerTool(name, { description, inputSchema }, async (input) => {
-      const parsed = inputSchema.safeParse(input);
-      if (!parsed.success) return errorResult(z.prettifyError(parsed.error));
-      try {
-        return textResult(await run(parsed.data));
-      } catch (error) {
-        return errorResult(
-          error instanceof Error ? error.message : String(error),
-        );
-      }
-    });
-  }
+  const register = parityTool(server, client);
   register(
     "list_cycles",
     "List current, upcoming or past workspace cycles, with progress from readable projects and the workspace's estimate scale. Cycles run automatically; there is no manual start operation.",
@@ -52,6 +35,100 @@ export function registerCycleTools(server: ToolRegistrar, client: ToolClient) {
       client.json(`/api/parity/cycle/item/${encodeURIComponent(id)}`, {
         method: "GET",
       }),
+  );
+  register(
+    "get_cycle_settings",
+    "Read the workspace's automatic cycle cadence, timezone, upcoming cycle count, rollover and estimate scale.",
+    z.strictObject({ workspaceId: id }),
+    ({ workspaceId }) =>
+      client.json(
+        `/api/parity/cycle/settings/${encodeURIComponent(workspaceId)}`,
+        { method: "GET" },
+      ),
+  );
+  register(
+    "update_cycle_settings",
+    "Configure automatic cycle creation and rollover. Enabling cycles generates the current and upcoming cycles; upcomingCycles controls the lookahead. Cadence/timezone changes reschedule upcoming cycles. Disabling closes the active cycle, deletes upcoming cycles and clears their task assignments while preserving past history. Requires workspace settings permission. Cycles start/close automatically; individual manual creation/deletion is not supported.",
+    z
+      .strictObject({
+        workspaceId: id,
+        cyclesEnabled: z.boolean().optional(),
+        estimateScale: z
+          .enum(["none", "linear", "fibonacci", "t-shirt"])
+          .optional(),
+        cycleWeeks: z.number().int().min(1).max(8).optional(),
+        cooldownWeeks: z.number().int().min(0).max(8).optional(),
+        cycleStartDay: z
+          .number()
+          .int()
+          .min(0)
+          .max(6)
+          .describe("Weekday: 0 Sunday through 6 Saturday")
+          .optional(),
+        upcomingCycles: z.number().int().min(1).max(15).optional(),
+        autoRollover: z.boolean().optional(),
+        timeZone: z
+          .string()
+          .min(1)
+          .max(100)
+          .refine((value) => {
+            try {
+              if (/^[+-]/.test(value)) return false;
+              new Intl.DateTimeFormat("en", { timeZone: value });
+              return true;
+            } catch {
+              return false;
+            }
+          }, "Use an IANA time zone")
+          .optional(),
+      })
+      .refine(hasChanges, "Provide at least one cycle setting"),
+    ({ workspaceId, ...body }) =>
+      client.json(
+        `/api/parity/cycle/settings/${encodeURIComponent(workspaceId)}`,
+        { method: "PUT", body: JSON.stringify(body) },
+      ),
+  );
+  register(
+    "update_cycle",
+    "Rename a cycle (null restores its default numbered name) or reschedule an upcoming cycle. Dates are YYYY-MM-DD in the workspace timezone; endDate is exclusive. Dates must be future, non-overlapping and at most eight weeks apart. Current/past cycle dates cannot change. Requires project update permission.",
+    z
+      .strictObject({
+        id,
+        name: z.string().trim().min(1).max(200).nullable().optional(),
+        startDate: z.iso.date().optional(),
+        endDate: z.iso.date().optional(),
+      })
+      .refine(hasChanges, "Provide at least one cycle field"),
+    ({ id, ...body }) =>
+      client.json(`/api/parity/cycle/item/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      }),
+  );
+  register(
+    "list_cycle_tasks",
+    "List issues in a cycle across readable projects, with filters and pagination. Use update_task_cycle to assign, move or remove issues. Paginate while hasMore is true.",
+    z.strictObject({
+      id,
+      ...page,
+      projectId: id.optional(),
+      assigneeId: id.optional(),
+      category: z
+        .enum(["backlog", "unstarted", "started", "completed", "canceled"])
+        .optional(),
+      status: z.string().min(1).max(128).optional(),
+      priority: z
+        .enum(["no-priority", "low", "medium", "high", "urgent"])
+        .optional(),
+      label: z.string().min(1).max(200).optional(),
+      search: z.string().trim().max(200).optional(),
+    }),
+    ({ id, ...options }) =>
+      client.json(
+        `/api/parity/cycle/item/${encodeURIComponent(id)}/tasks?${queryString(options)}`,
+        { method: "GET" },
+      ),
   );
   register(
     "update_task_cycle",

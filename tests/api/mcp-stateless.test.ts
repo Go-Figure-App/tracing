@@ -12,6 +12,22 @@ vi.mock("../../apps/api/src/auth", () => ({
 }));
 
 const protocolVersion = "2026-07-28";
+const planningManagementTools = [
+  "create_milestone",
+  "update_milestone",
+  "delete_milestone",
+  "get_task_milestone",
+  "update_task_milestone",
+  "update_initiative",
+  "delete_initiative",
+  "reorder_initiatives",
+  "remove_project_from_initiative",
+  "list_status_updates",
+  "get_cycle_settings",
+  "update_cycle_settings",
+  "update_cycle",
+  "list_cycle_tasks",
+];
 
 const currentUser = {
   id: "test-user",
@@ -100,6 +116,13 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
     expect(first.headers.has("mcp-session-id")).toBe(false);
     expect(second.headers.has("mcp-session-id")).toBe(false);
     expect(firstBody.result.tools).toEqual(secondBody.result.tools);
+    expect(firstBody.result.tools).toEqual(
+      expect.arrayContaining(
+        planningManagementTools.map((name) =>
+          expect.objectContaining({ name }),
+        ),
+      ),
+    );
     expect(firstBody.result.tools).toContainEqual(
       expect.objectContaining({ name: "whoami" }),
     );
@@ -286,8 +309,13 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
     const response = await mcpRoutes.request(request);
 
     expect(response.status).toBe(200);
-    expect((await rpcBody(response)).result.tools).toContainEqual(
-      expect.objectContaining({ name: "whoami" }),
+    expect((await rpcBody(response)).result.tools).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "whoami" }),
+        ...planningManagementTools.map((name) =>
+          expect.objectContaining({ name }),
+        ),
+      ]),
     );
 
     const unauthenticated = new Request("http://mcp.test/mcp", {
