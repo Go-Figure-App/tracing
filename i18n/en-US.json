@@ -5553,7 +5553,14 @@
 			"searchProjects": "Search projects…",
 			"searchInitiatives": "Search initiatives…",
 			"allInitiatives": "All initiatives",
-			"properties": "Properties"
+			"properties": "Properties",
+			"showDetails": "Show details",
+			"hideDetails": "Hide details",
+			"projectNavigation": "Project navigation",
+			"layout": "Layout",
+			"noHealthUpdates": "No updates",
+			"issues": "Issues",
+			"clear": "Clear date"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -5870,6 +5877,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "My issues",
+			"newIssue": "New issue"
 		}
 	}
 }

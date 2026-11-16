@@ -20,7 +20,11 @@ export function ProjectDisplayOptions({
   setOrderBy,
   columns,
   setColumns,
+  layout,
+  setLayout,
 }: {
+  layout?: "list" | "board";
+  setLayout?: (value: "list" | "board") => void;
   groupBy: ProjectGrouping;
   setGroupBy: (value: ProjectGrouping) => void;
   orderBy: ProjectOrder;
@@ -38,11 +42,31 @@ export function ProjectDisplayOptions({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 space-y-4 p-4">
+        {setLayout && (
+          <div
+            role="group"
+            aria-label={t("parity:planning.layout")}
+            className="grid grid-cols-2 gap-2"
+          >
+            {(["list", "board"] as const).map((value) => (
+              <Button
+                key={value}
+                variant={layout === value ? "secondary" : "outline"}
+                size="sm"
+                aria-pressed={layout === value}
+                onClick={() => setLayout(value)}
+              >
+                {t(`tasks:view.${value}`)}
+              </Button>
+            ))}
+          </div>
+        )}
         <label className="flex items-center justify-between gap-4 text-xs">
           {t("parity:views.groupBy")}
           <select
             className="rounded-md border bg-background px-2 py-1.5"
-            value={groupBy}
+            disabled={layout === "board"}
+            value={layout === "board" ? "status" : groupBy}
             onChange={(event) =>
               setGroupBy(event.target.value as ProjectGrouping)
             }

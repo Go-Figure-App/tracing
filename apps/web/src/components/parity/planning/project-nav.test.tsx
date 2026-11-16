@@ -1,23 +1,31 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { afterEach, expect, it, vi } from "vite-plus/test";
 import { ProjectPlanningNav } from "./project-nav";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
+const route = vi.hoisted(() => ({
+  pathname: "/dashboard/workspace/workspace/project/project/overview",
+}));
 vi.mock("@tanstack/react-router", () => ({
+  useLocation: () => route,
   Link: ({
     children,
     to,
-    params,
+    params = {},
+    ...props
   }: {
     children: ReactNode;
     to: string;
-    params: Record<string, string>;
-  }) => (
-    <a href={to.replace(/\$(\w+)/g, (_, key: string) => params[key])}>
+    params?: Record<string, string>;
+  } & AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a
+      {...props}
+      href={to.replace(/\$(\w+)/g, (_, key: string) => params[key])}
+    >
       {children}
     </a>
   ),
@@ -47,4 +55,22 @@ it("links the current project's overview when planning is enabled", () => {
     "href",
     "/dashboard/workspace/workspace/project/project/overview",
   );
+});
+
+it("shares Overview, Updates and Issues tabs and identifies the current section", () => {
+  route.pathname = "/dashboard/workspace/workspace/project/project/updates";
+  renderNav(["projects"]);
+  expect(screen.getAllByRole("link")).toHaveLength(3);
+  expect(
+    screen.getByRole("link", { name: "parity:planning.updates" }),
+  ).toHaveAttribute("aria-current", "page");
+  expect(
+    screen.getByRole("link", { name: "parity:cycles.tasks" }),
+  ).toHaveAttribute(
+    "href",
+    "/dashboard/workspace/workspace/project/project/board",
+  );
+  expect(
+    screen.getByRole("link", { name: "parity:planning.overview" }),
+  ).not.toHaveAttribute("aria-current");
 });

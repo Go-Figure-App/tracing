@@ -1,7 +1,14 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 import { HttpError } from "@/lib/http-error";
 import ProjectLayout from "./project-layout";
 
@@ -57,12 +64,28 @@ vi.mock("@/components/shared/modals/create-project-modal", () => ({
 }));
 vi.mock("@/components/page-title", () => ({ default: () => null }));
 
-afterEach(cleanup);
+vi.mock("@/components/parity/planning/project-details", () => ({
+  ProjectDetails: () => <p>Project detail properties</p>,
+}));
+vi.mock("@/components/parity/views/favorite-button", () => ({
+  FavoriteButton: () => null,
+}));
+beforeEach(() => {
+  sessionStorage.clear();
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn(() => ({ matches: false })),
+  );
+});
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
-function renderLayout() {
+function renderLayout(features: string[] = []) {
   const client = new QueryClient();
   // The layout now reads the instance's optional planning capabilities.
-  client.setQueryData(["parity", "features"], { features: [] });
+  client.setQueryData(["parity", "features"], { features });
   client.setQueryDefaults(["parity", "features"], { staleTime: Infinity });
   render(
     <QueryClientProvider client={client}>
@@ -133,4 +156,21 @@ describe("ProjectLayout access states", () => {
       "/dashboard/workspace/$workspaceId/project/$projectId/backlog",
     );
   });
+});
+
+it("shows and hides the planning details panel and remembers the choice", () => {
+  project.current = { data: { name: "Alpha" }, error: null };
+  renderLayout(["projects"]);
+  fireEvent.click(
+    screen.getByRole("button", { name: "parity:planning.showDetails" }),
+  );
+  expect(screen.getByText("Project detail properties")).toBeVisible();
+  fireEvent.click(
+    screen.getByRole("button", { name: "parity:planning.hideDetails" }),
+  );
+  expect(screen.queryByText("Project detail properties")).toBeNull();
+  expect(sessionStorage.getItem("tracing:project-details:workspace-1")).toBe(
+    "closed",
+  );
+  expect(screen.getByText("Board content")).toBeVisible();
 });

@@ -5553,7 +5553,14 @@
 			"searchProjects": "प्रोजेक्ट खोजें",
 			"searchInitiatives": "पहल खोजें",
 			"allInitiatives": "सभी पहल",
-			"properties": "गुण"
+			"properties": "गुण",
+			"showDetails": "विवरण दिखाएँ",
+			"hideDetails": "विवरण छिपाएँ",
+			"projectNavigation": "प्रोजेक्ट नेविगेशन",
+			"layout": "लेआउट",
+			"noHealthUpdates": "कोई अपडेट नहीं",
+			"issues": "Issues",
+			"clear": "तारीख साफ़ करें"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -5870,6 +5877,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "मेरे मुद्दे",
+			"newIssue": "नया मुद्दा"
 		}
 	}
 }

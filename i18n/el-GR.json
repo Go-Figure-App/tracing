@@ -5553,7 +5553,14 @@
 			"searchProjects": "Αναζήτηση έργων",
 			"searchInitiatives": "Αναζήτηση πρωτοβουλιών",
 			"allInitiatives": "Όλες οι πρωτοβουλίες",
-			"properties": "Ιδιότητες"
+			"properties": "Ιδιότητες",
+			"showDetails": "Εμφάνιση λεπτομερειών",
+			"hideDetails": "Απόκρυψη λεπτομερειών",
+			"projectNavigation": "Πλοήγηση έργου",
+			"layout": "Διάταξη",
+			"noHealthUpdates": "Καμία ενημέρωση",
+			"issues": "Issues",
+			"clear": "Εκκαθάριση ημερομηνίας"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -5870,6 +5877,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "Τα ζητήματά μου",
+			"newIssue": "Νέο ζήτημα"
 		}
 	}
 }

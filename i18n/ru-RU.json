@@ -5791,7 +5791,14 @@
 			"searchProjects": "Поиск проектов",
 			"searchInitiatives": "Поиск инициатив",
 			"allInitiatives": "Все инициативы",
-			"properties": "Свойства"
+			"properties": "Свойства",
+			"showDetails": "Показать подробности",
+			"hideDetails": "Скрыть подробности",
+			"projectNavigation": "Навигация проекта",
+			"layout": "Макет",
+			"noHealthUpdates": "Нет обновлений",
+			"issues": "Issues",
+			"clear": "Очистить дату"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -6112,6 +6119,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "Мои задачи",
+			"newIssue": "Новая задача"
 		}
 	}
 }

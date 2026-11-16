@@ -1,14 +1,14 @@
 import { Fragment, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { UserRound } from "lucide-react";
+import { ProjectProperty } from "./project-property";
 import { useTranslation } from "react-i18next";
 import icons from "@/constants/project-icons";
-import { formatDateMedium } from "@/lib/format";
-import { getPriorityIcon } from "@/lib/priority";
 import { HealthBadge } from "./health-badge";
 import { projectStatuses, usePlanningLabels } from "./labels";
 import {
   projectColumns,
+  defaultProjectColumns,
+  type ProjectOrder,
   type ProjectColumn,
   type ProjectGrouping,
   type ProjectSummary,
@@ -17,14 +17,18 @@ import { PlanningStatusIcon } from "./status-icon";
 
 export function ProjectsTable({
   projects,
-  columns = projectColumns,
+  columns = defaultProjectColumns,
   groupBy = "none",
   actions,
+  orderBy,
+  onOrderChange,
 }: {
   projects: ProjectSummary[];
   columns?: ProjectColumn[];
   groupBy?: ProjectGrouping;
   actions?: (project: ProjectSummary) => ReactNode;
+  orderBy?: ProjectOrder;
+  onOrderChange?: (order: ProjectOrder) => void;
 }) {
   const { t, i18n } = useTranslation();
   const labels = usePlanningLabels();
@@ -47,25 +51,59 @@ export function ProjectsTable({
       ),
     }))
     .filter((group) => group.projects.length);
-  const number = new Intl.NumberFormat(i18n.language);
+  const number = new Intl.NumberFormat(i18n.language, {
+    maximumFractionDigits: 0,
+  });
   return (
     <div className="overflow-x-auto">
       <table
         className="w-full table-fixed text-left text-[13px]"
-        style={{ minWidth: 320 + visible.length * 128 }}
+        style={{ minWidth: 260 + visible.length * 92 }}
       >
         <thead className="text-xs text-muted-foreground">
           <tr>
-            <th scope="col" className="min-w-64 px-5 py-3 font-normal">
-              {t("parity:planning.name")}
+            <th
+              scope="col"
+              className="min-w-56 px-5 py-3 font-normal"
+              aria-sort={orderBy === "name" ? "ascending" : undefined}
+            >
+              {onOrderChange ? (
+                <button
+                  className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => onOrderChange("name")}
+                >
+                  {t("parity:planning.name")}
+                </button>
+              ) : (
+                t("parity:planning.name")
+              )}
             </th>
             {visible.map((column) => (
               <th
                 key={column}
                 scope="col"
-                className={`px-3 py-3 font-normal ${column === "priority" ? "w-20" : column === "lead" ? "w-32" : "w-36"}`}
+                aria-sort={
+                  orderBy === column
+                    ? column === "progress"
+                      ? "descending"
+                      : "ascending"
+                    : undefined
+                }
+                className={`px-3 py-3 font-normal ${column === "priority" || column === "lead" || column === "issues" ? "w-20" : "w-36"}`}
               >
-                {t(`parity:planning.${column}`)}
+                {onOrderChange &&
+                (column === "priority" ||
+                  column === "targetDate" ||
+                  column === "progress") ? (
+                  <button
+                    className="rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                    onClick={() => onOrderChange(column)}
+                  >
+                    {t(`parity:planning.${column}`)}
+                  </button>
+                ) : (
+                  t(`parity:planning.${column}`)
+                )}
               </th>
             ))}
             {actions && (
@@ -108,7 +146,7 @@ export function ProjectsTable({
                 return (
                   <tr
                     key={project.id}
-                    className="group h-12 border-b border-border/40 transition-colors last:border-0 hover:bg-accent/40 focus-within:bg-accent/40"
+                    className="group h-12 transition-colors hover:bg-accent/40 focus-within:bg-accent/40"
                   >
                     <td className="px-5 py-2">
                       <Link
@@ -131,54 +169,59 @@ export function ProjectsTable({
                     {visible.map((column) => (
                       <td key={column} className="px-3 py-2 text-xs">
                         {column === "status" && (
-                          <span className="flex items-center gap-2 whitespace-nowrap">
-                            <PlanningStatusIcon status={project.status} />
-                            {labels.status[project.status]}
-                          </span>
+                          <div className="flex items-center gap-1">
+                            <ProjectProperty
+                              project={project}
+                              field="status"
+                              compact
+                            />
+                            <span
+                              title={t(
+                                "parity:planning.completed",
+                                project.progress,
+                              )}
+                              className="tabular-nums text-muted-foreground"
+                            >
+                              {number.format(percent)}%
+                            </span>
+                          </div>
                         )}
                         {column === "health" && (
-                          <HealthBadge health={project.health} />
+                          <HealthBadge
+                            health={
+                              project.latestUpdate ? project.health : null
+                            }
+                          />
                         )}
                         {column === "priority" && (
-                          <span
-                            className="inline-flex"
-                            title={labels.priority[project.priority]}
-                          >
-                            <span aria-hidden="true">
-                              {getPriorityIcon(project.priority)}
-                            </span>
-                            <span className="sr-only">
-                              {labels.priority[project.priority]}
-                            </span>
-                          </span>
+                          <ProjectProperty
+                            project={project}
+                            field="priority"
+                            compact
+                          />
                         )}
                         {column === "lead" && (
-                          <span
-                            className="flex items-center gap-2"
-                            title={
-                              project.leadName ?? t("parity:planning.noLead")
-                            }
-                          >
-                            <UserRound
-                              aria-hidden="true"
-                              className="size-4 shrink-0 text-muted-foreground"
-                            />
-                            <span className="truncate">
-                              {project.leadName ?? t("parity:planning.noLead")}
-                            </span>
-                          </span>
+                          <ProjectProperty
+                            project={project}
+                            field="leadId"
+                            compact
+                          />
                         )}
                         {column === "targetDate" && (
-                          <span className="whitespace-nowrap text-muted-foreground">
-                            {project.targetDate ? (
-                              formatDateMedium(
-                                new Date(`${project.targetDate}T12:00:00`),
-                              )
-                            ) : (
-                              <span aria-label={t("parity:planning.noDate")}>
-                                —
-                              </span>
+                          <ProjectProperty
+                            project={project}
+                            field="targetDate"
+                          />
+                        )}
+                        {column === "issues" && (
+                          <span
+                            className="tabular-nums text-muted-foreground"
+                            title={t(
+                              "parity:planning.completed",
+                              project.progress,
                             )}
+                          >
+                            {number.format(project.progress.total)}
                           </span>
                         )}
                         {column === "progress" && (

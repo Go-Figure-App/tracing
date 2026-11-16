@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
+import { CreateIssueButton } from "@/components/parity/navigation/create-issue-button";
 import Search from "@/components/search";
 import {
   DropdownMenu,
@@ -31,7 +32,11 @@ import { hasInstanceAdminRole } from "@/lib/instance-admin";
 import type { Workspace } from "@/types/workspace";
 import CreateWorkspaceModal from "./shared/modals/create-workspace-modal";
 
-export function WorkspaceSwitcher() {
+export function WorkspaceSwitcher({
+  planning = false,
+}: {
+  planning?: boolean;
+}) {
   const { t } = useTranslation();
   const { data: workspace } = useActiveWorkspace();
 
@@ -117,6 +122,14 @@ export function WorkspaceSwitcher() {
                 }
               >
                 <div className="flex items-center min-w-0 w-full">
+                  {planning && (
+                    <span
+                      aria-hidden="true"
+                      className="mr-1.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-[9px] font-semibold"
+                    >
+                      {workspace.name.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
                   <span
                     className={`truncate text-sm font-medium text-foreground ${isSwitching ? "opacity-50" : ""}`}
                   >
@@ -192,9 +205,13 @@ export function WorkspaceSwitcher() {
 
         <div className="flex items-center gap-0.5">
           <Search />
-          <div className="h-8 w-8 shrink-0">
-            <UserAvatar />
-          </div>
+          {planning ? (
+            <CreateIssueButton />
+          ) : (
+            <div className="h-8 w-8 shrink-0">
+              <UserAvatar />
+            </div>
+          )}
         </div>
       </div>
 

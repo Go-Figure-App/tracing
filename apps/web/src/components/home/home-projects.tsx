@@ -1,3 +1,4 @@
+import { usePlanningEnabled } from "@/components/parity/planning/queries";
 import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -20,6 +21,7 @@ export function HomeProjects({
   onCreateProject,
 }: HomeProjectsProps) {
   const { t } = useTranslation();
+  const planning = usePlanningEnabled("projects");
   const {
     data: projects,
     isPending,
@@ -81,9 +83,13 @@ export function HomeProjects({
             return (
               <Link
                 key={project.id}
-                to="/dashboard/workspace/$workspaceId/project/$projectId/board"
+                to={
+                  planning
+                    ? "/dashboard/workspace/$workspaceId/project/$projectId/overview"
+                    : "/dashboard/workspace/$workspaceId/project/$projectId/board"
+                }
                 params={{ workspaceId, projectId: project.id }}
-                {...boardHoverPrefetch(project.id)}
+                {...(planning ? {} : boardHoverPrefetch(project.id))}
                 className="flex flex-col gap-3.5 rounded-lg border border-border p-3.5 outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <div className="flex items-center gap-2">
