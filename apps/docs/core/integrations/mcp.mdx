@@ -81,6 +81,40 @@ Both the HTTP endpoint and stdio package expose the same tools:
 - Labels: `list_workspace_labels`, `create_label`, `attach_label_to_task`, `detach_label_from_task`, `delete_label`
 - Task relations: `create_task_relation`, `get_task_relations`, `delete_task_relation`
 
+### Planning tools
+
+The hosted endpoint and source-built stdio server also share these planning tools:
+
+- Project planning: `get_project_plan`, `update_project_plan`.
+- Milestones: `list_milestones`, `create_milestone`, `update_milestone`, `delete_milestone`, `get_task_milestone`, `update_task_milestone`.
+- Initiatives: `list_initiatives`, `get_initiative`, `create_initiative`, `update_initiative`, `delete_initiative`, `reorder_initiatives`, `add_project_to_initiative`, `remove_project_from_initiative`.
+- Updates: `list_status_updates`, `create_status_update` for projects or initiatives.
+- Cycles: `list_cycles`, `get_cycle`, `get_cycle_settings`, `update_cycle_settings`, `update_cycle`, `list_cycle_tasks`, `update_task_cycle`, `update_task_estimate`.
+
+These tools require the corresponding planning features to be enabled. The API enforces the signed-in user's workspace/project permissions and API-key scopes. They do not grant extra access.
+
+Cycles are generated, started and closed automatically. Use `update_cycle_settings` to enable them, set cadence, timezone, lookahead (`upcomingCycles`) and rollover, then `list_cycles` to find the generated IDs. This requires workspace settings permission. Changing cadence reschedules upcoming cycles. Disabling cycles closes the active cycle, deletes upcoming cycles and clears their assignments; past history and tasks remain. There is no individual manual create/start/delete operation.
+
+Use `update_cycle` to rename any cycle or change an upcoming cycle's dates. Dates use the workspace timezone, with an exclusive end date. The API rejects overlapping ranges, changes to current/past dates and durations above eight weeks. `list_cycle_tasks` supports project, assignee, category, status, priority, label and text filters with pagination.
+
+For milestones, `update_milestone` accepts a zero-based `position` for reordering. `update_task_milestone` accepts a milestone in the task's project or explicit `null` to unassign. Deleting a milestone clears its task assignments without deleting the tasks.
+
+For initiatives, use `update_initiative` with `archived: true` to archive or `false` to restore. Archiving/restoring and permanent deletion require workspace settings permission. Other edits and project links require project update permission and project visibility. Removing a link preserves the project. `reorder_initiatives` takes every non-archived initiative ID exactly once; read every page first, and refresh if the API reports a conflict. An existing link can be reordered with `add_project_to_initiative` and `position`.
+
+Omit fields to preserve their values. Use explicit `null` to clear nullable owners, dates, icons or colors, and an empty string to clear descriptions. Paginated tools return `hasMore`; continue fetching pages until it is false. Status updates can be read and posted; the API has no edit/delete status-update operation.
+
+### Connect from Claude
+
+Add a custom remote connector in Claude with:
+
+```text
+https://tracing.gofigureapp.io/api/mcp
+```
+
+Choose OAuth sign-in and automatic client registration if asked. Sign into Tracing and approve the connection. Enable the connector in your conversation. After a server update, refresh its tool list or reconnect if Claude still shows the old catalog.
+
+Try: “Create a launch milestone, assign these issues to it, and post an initiative status update.” For cycles: “Show our cycle settings and upcoming cycles, then rename the next cycle.”
+
 Use `get_task_by_ticket_id` with a key such as `KAN-12` to fetch one task directly. If the same key identifies multiple accessible tasks, pass `workspaceId` or `projectId` to select one.
 
 `list_project_columns` is worth calling first when setting a status: the column
