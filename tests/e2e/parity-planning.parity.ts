@@ -52,6 +52,23 @@ async function fixture(page: Page, baseURL: string | undefined) {
   };
 }
 
+async function saveProjectProperty(
+  page: Page,
+  label: string,
+  value: string,
+  date = false,
+) {
+  await page.getByRole("button", { name: new RegExp(`^${label}:`) }).click();
+  const input = page.getByLabel(label, { exact: true });
+  await expect(input).toBeEnabled();
+  if (date) await input.fill(value);
+  else await input.selectOption(value);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Save", exact: true }),
+  ).toHaveCount(0);
+}
+
 test("project properties, milestone assignment and status updates stay in sync", async ({
   page,
   context,
@@ -66,24 +83,14 @@ test("project properties, milestone assignment and status updates stay in sync",
   await expect(
     page.getByText("1 of 2 issues completed", { exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Edit properties", exact: true })
-    .click();
-  const dialog = page.getByRole("dialog");
-  await dialog
-    .getByRole("combobox", { name: "Status", exact: true })
-    .selectOption("started");
-  await dialog
-    .getByRole("combobox", { name: "Lead", exact: true })
-    .selectOption(f.user.id);
-  await dialog.getByLabel("Start date", { exact: true }).fill("2030-01-01");
-  await dialog.getByLabel("Target date", { exact: true }).fill("2030-02-01");
-  await dialog
-    .getByRole("combobox", { name: "Priority", exact: true })
-    .selectOption("high");
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(dialog).toHaveCount(0);
+  await page.getByRole("button", { name: "Hide details", exact: true }).click();
+  await saveProjectProperty(page, "Status", "started");
+  await saveProjectProperty(page, "Lead", f.user.id);
+  await saveProjectProperty(page, "Start date", "2030-01-01", true);
+  await saveProjectProperty(page, "Target date", "2030-02-01", true);
+  await saveProjectProperty(page, "Priority", "high");
   await expect(page.getByText("Jan 1, 2030", { exact: true })).toBeVisible();
+  const dialog = page.getByRole("dialog");
   await page
     .getByRole("button", { name: "New milestone", exact: true })
     .click();
@@ -124,6 +131,10 @@ test("project properties, milestone assignment and status updates stay in sync",
   ).toBeVisible();
 
   await page
+    .getByRole("navigation", { name: "Project navigation" })
+    .getByRole("link", { name: "Updates", exact: true })
+    .click();
+  await page
     .getByRole("combobox", { name: "Health", exact: true })
     .selectOption("at_risk");
   await page
@@ -137,18 +148,12 @@ test("project properties, milestone assignment and status updates stay in sync",
   await page.reload();
   await expect(update).toBeVisible();
   await page
-    .getByRole("button", { name: "Edit properties", exact: true })
+    .getByRole("navigation", { name: "Project navigation" })
+    .getByRole("link", { name: "Overview", exact: true })
     .click();
-  await expect(
-    dialog.getByRole("combobox", { name: "Lead", exact: true }),
-  ).toHaveValue(f.user.id);
-  await dialog
-    .getByRole("combobox", { name: "Lead", exact: true })
-    .selectOption("");
-  await dialog.getByLabel("Start date", { exact: true }).fill("");
-  await dialog.getByLabel("Target date", { exact: true }).fill("");
-  await dialog.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(dialog).toHaveCount(0);
+  await saveProjectProperty(page, "Lead", "");
+  await saveProjectProperty(page, "Start date", "", true);
+  await saveProjectProperty(page, "Target date", "", true);
   const plan = await page.request.get(
     `/api/parity/project-plan/${f.project.id}`,
   );
@@ -344,4 +349,54 @@ test("a denied background refresh clears initiative content and can be retried",
     }),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
+test("project board edits regroup cards and sidebar sections remain navigable", async ({
+  page,
+  baseURL,
+}) => {
+  const f = await fixture(page, baseURL);
+  await page.goto(`${f.path}/projects`);
+  await page.getByRole("button", { name: "Workspace", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Projects", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Workspace", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Projects", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Display", exact: true }).click();
+  await page.getByRole("button", { name: "Board", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await expect(
+    page
+      .getByRole("region", { name: "Backlog", exact: true })
+      .getByRole("link", { name: "Launch readiness", exact: true }),
+  ).toBeVisible();
+  await saveProjectProperty(page, "Status", "started");
+  await expect(
+    page
+      .getByRole("region", { name: "In progress", exact: true })
+      .getByRole("link", { name: "Launch readiness", exact: true }),
+  ).toBeVisible();
+  await saveProjectProperty(page, "Status", "backlog");
+  await expect(
+    page
+      .getByRole("region", { name: "Backlog", exact: true })
+      .getByRole("link", { name: "Launch readiness", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Display", exact: true }).click();
+  await page.getByRole("button", { name: "List", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("table")).toBeVisible();
+  await page
+    .getByRole("link", { name: "Launch readiness", exact: true })
+    .click();
+  await expect(
+    page.getByRole("navigation", { name: "Project navigation" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Hide details", exact: true }).click();
+  await expect(
+    page.getByRole("complementary", { name: "Properties", exact: true }),
+  ).toHaveCount(0);
 });
