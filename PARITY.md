@@ -351,6 +351,11 @@ match combined accessibility labels and the localized ellipsis; the navigation
 and modal fixes were then verified through the corrected flows. No physical
 device, older iOS runtime or distribution binary was exercised in this slice.
 
+Review correction: render the unread badge only for positive counts. The locked
+Router version processes nonempty badge children before its `hidden` property,
+so a hidden badge containing `"0"` would still appear. Positive counts and the
+`99+` cap are retained.
+
 The Teams core changes are parked until this PR is approved, green and merged,
 as requested by the maintainer. Distribution builds are iOS only; production
 API enablement and store submission remain separate.

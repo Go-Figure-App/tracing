@@ -66,9 +66,11 @@ export function NativeNavigation() {
           <NativeTabs.Trigger.Label hidden={hideLabels}>
             {t("mobile:nav.inbox")}
           </NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Badge hidden={count === 0}>
-            {count > 99 ? "99+" : String(count)}
-          </NativeTabs.Trigger.Badge>
+          {count > 0 ? (
+            <NativeTabs.Trigger.Badge>
+              {count > 99 ? "99+" : String(count)}
+            </NativeTabs.Trigger.Badge>
+          ) : null}
         </NativeTabs.Trigger>
         <NativeTabs.Trigger
           name="(collections)"
