@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Mail, Plus, Settings, Tag, Users } from "lucide-react-native";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 
 import { Sheet } from "@/components/sheet";
 import { Txt } from "@/components/text";
@@ -57,6 +57,7 @@ export function WorkspaceSheet({
 }) {
   const { t } = useTranslation(["mobile"]);
   const c = useColors();
+  const pendingRoute = useRef<Parameters<typeof router.push>[0] | null>(null);
   const workspaces = useWorkspaces();
   const invitations = useQuery({
     queryKey: qk.invitations,
@@ -66,8 +67,11 @@ export function WorkspaceSheet({
     (i) => i.status === "pending",
   ).length;
   const go = (path: Parameters<typeof router.push>[0]) => {
+    // A native tab can freeze as its parent stack navigates. Finish dismissing
+    // the iOS modal first so it cannot remain over the destination screen.
+    if (Platform.OS === "ios") pendingRoute.current = path;
     onClose();
-    router.push(path);
+    if (Platform.OS !== "ios") router.push(path);
   };
   const icon = (Icon: typeof Users) => (
     <Icon size={18} color={c.ink2} strokeWidth={2} />
@@ -77,6 +81,11 @@ export function WorkspaceSheet({
     <Sheet
       visible={visible}
       onClose={onClose}
+      onDismiss={() => {
+        const path = pendingRoute.current;
+        pendingRoute.current = null;
+        if (path) router.push(path);
+      }}
       title={t("mobile:workspaceSwitcher.title")}
     >
       <View style={{ paddingHorizontal: 8, paddingBottom: 8 }}>

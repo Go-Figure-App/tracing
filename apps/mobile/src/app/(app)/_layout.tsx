@@ -12,7 +12,7 @@ export default function SignedInLayout() {
         animation: "slide_from_right",
       }}
     >
-      <Stack.Screen name="index" />
+      <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="task/new"
         options={{ animation: "slide_from_bottom" }}

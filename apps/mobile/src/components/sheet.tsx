@@ -26,6 +26,7 @@ import { Button, Checkbox, SelectionSlot, Touch } from "./ui";
 export function Sheet({
   visible,
   onClose,
+  onDismiss,
   title,
   aside,
   children,
@@ -33,6 +34,7 @@ export function Sheet({
 }: {
   visible: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
   title?: string;
   aside?: ReactNode;
   children: ReactNode;
@@ -63,16 +65,18 @@ export function Sheet({
     }
   }, [visible, progress]);
 
-  if (!mounted) return null;
+  // Keep the Modal host mounted until its native dismissal event. Unmounting
+  // the host would remove the onDismiss listener before iOS can deliver it.
   const maxHeight = Dimensions.get("window").height * 0.88;
   const Body = scroll ? ScrollView : View;
 
   return (
     <Modal
       transparent
-      visible
+      visible={mounted}
       animationType="none"
       onRequestClose={onClose}
+      onDismiss={onDismiss}
       statusBarTranslucent
       navigationBarTranslucent
     >
