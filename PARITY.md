@@ -267,6 +267,17 @@ the mobile visual pass.
 | Native glass, browser UI and simulator | Research only; implementation/visual verification pending. |
 | Production/data/distribution | Not accessed or changed. |
 
+## Expo organization — November 16, 2026
+
+The maintainer authorized moving Tracing builds to the `tracing` Expo
+organization and generating builds there. The supplied project identity stays
+`4dfa905a-804d-4710-a412-559fc4428e21`, slug `tracing`, with native application
+ID `io.gofigureapp.tracing`. `apps/mobile/app.config.js` changes only its default
+Expo owner; `apps/mobile/README.md` records the organization and project link.
+Existing fork overrides remain available. Check the remote owner/project before
+dispatching builds, and omit the local-server override from distribution builds.
+Store/TestFlight submission remains a separate step from build generation.
+
 ## Boundaries
 
 - API logic: `apps/api/src/parity/<feature>/`.
