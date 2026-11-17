@@ -1,7 +1,7 @@
 import { uniquePageItems } from "./unique-page-items";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Import, Plus, Search } from "lucide-react";
+import { Filter, Import, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TrialExpiredCallout } from "@/components/billing/trial-expired-callout";
@@ -13,10 +13,16 @@ import { getProjectPlans } from "@/fetchers/parity/projects";
 import { useCanImport } from "@/hooks/use-can-import";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { projectStatuses, usePlanningLabels } from "./labels";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ProjectsBoard } from "./projects-board";
 import { ProjectsTable } from "./projects-table";
 import { ProjectDisplayOptions } from "./project-display-options";
 import {
-  projectColumns,
+  defaultProjectColumns,
   selectProjects,
   type ProjectColumn,
   type ProjectGrouping,
@@ -31,7 +37,10 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
   const [creating, setCreating] = useState(false);
   const [groupBy, setGroupBy] = useState<ProjectGrouping>("none");
   const [orderBy, setOrderBy] = useState<ProjectOrder>("name");
-  const [columns, setColumns] = useState<ProjectColumn[]>(projectColumns);
+  const [columns, setColumns] = useState<ProjectColumn[]>(
+    defaultProjectColumns,
+  );
+  const [layout, setLayout] = useState<"list" | "board">("list");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const query = useInfiniteQuery({
@@ -101,20 +110,44 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
               className="h-8 min-w-0 w-full bg-transparent text-xs outline-none"
             />
           </label>
-          <select
-            aria-label={t("parity:planning.status")}
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-            className="h-8 max-w-40 rounded-md border border-border/60 bg-background px-2 text-xs"
-          >
-            <option value="">{t("parity:planning.allStatuses")}</option>
-            {projectStatuses.map((value) => (
-              <option key={value} value={value}>
-                {labels.status[value]}
-              </option>
-            ))}
-          </select>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label={t("common:actions.filter")}
+                aria-pressed={Boolean(status)}
+              >
+                <Filter className="size-3.5" />
+                <span className="hidden sm:inline">
+                  {status
+                    ? labels.status[status as keyof typeof labels.status]
+                    : t("common:actions.filter")}
+                </span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-56 space-y-2 p-3">
+              <label className="grid gap-2 text-xs">
+                {t("parity:planning.status")}
+                <select
+                  aria-label={t("parity:planning.status")}
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value)}
+                  className="h-8 max-w-40 rounded-md border border-border/60 bg-background px-2 text-xs"
+                >
+                  <option value="">{t("parity:planning.allStatuses")}</option>
+                  {projectStatuses.map((value) => (
+                    <option key={value} value={value}>
+                      {labels.status[value]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </PopoverContent>
+          </Popover>
           <ProjectDisplayOptions
+            layout={layout}
+            setLayout={setLayout}
             groupBy={groupBy}
             setGroupBy={setGroupBy}
             orderBy={orderBy}
@@ -143,11 +176,21 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
                 {t("parity:planning.noProjects")}
               </p>
             )}
-          <ProjectsTable
-            projects={visibleProjects}
-            groupBy={groupBy}
-            columns={columns}
-          />
+          {layout === "board" ? (
+            <ProjectsBoard
+              projects={visibleProjects}
+              columns={columns}
+              status={status}
+            />
+          ) : (
+            <ProjectsTable
+              orderBy={orderBy}
+              onOrderChange={setOrderBy}
+              projects={visibleProjects}
+              groupBy={groupBy}
+              columns={columns}
+            />
+          )}
           {!query.isError && query.hasNextPage && (
             <Button
               variant="outline"

@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/sidebar";
 import { usePlanningEnabled } from "../planning/queries";
 
-export function CycleNavigation({ workspaceId }: { workspaceId: string }) {
+export function CycleNavigation({
+  workspaceId,
+  expanded = false,
+  compact = false,
+}: {
+  workspaceId: string;
+  expanded?: boolean;
+  compact?: boolean;
+}) {
   const { t } = useTranslation();
   const enabled = usePlanningEnabled("cycles");
   const location = useLocation();
@@ -25,7 +33,11 @@ export function CycleNavigation({ workspaceId }: { workspaceId: string }) {
       <SidebarMenuButton
         isActive={active}
         tooltip={t("parity:cycles.title")}
-        className="h-8 text-sm"
+        className={
+          compact
+            ? "h-7 gap-2 rounded-md data-[active=true]:bg-none data-[active=true]:bg-sidebar-accent data-[active=true]:shadow-none text-[13px] [&>svg]:size-3.5"
+            : "h-8 text-sm"
+        }
         render={
           <Link
             to="/dashboard/workspace/$workspaceId/cycles"
@@ -37,9 +49,12 @@ export function CycleNavigation({ workspaceId }: { workspaceId: string }) {
         <CircleDashed aria-hidden="true" />
         <span>{t("parity:cycles.title")}</span>
       </SidebarMenuButton>
-      {active && (
+      {(active || expanded) && (
         <SidebarMenuSub>
-          {(["current", "upcoming", "past"] as const).map((tab) => (
+          {(compact
+            ? (["current", "upcoming"] as const)
+            : (["current", "upcoming", "past"] as const)
+          ).map((tab) => (
             <SidebarMenuSubItem key={tab}>
               <SidebarMenuSubButton
                 isActive={

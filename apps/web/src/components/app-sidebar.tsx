@@ -2,6 +2,9 @@ import { useLocation } from "@tanstack/react-router";
 import type * as React from "react";
 import { useEffect } from "react";
 
+import { usePlanningEnabled } from "@/components/parity/planning/queries";
+import { PlanningNavigation } from "@/components/parity/navigation/planning-navigation";
+import { UserAvatar } from "@/components/user-avatar";
 import { FavoritesNavigation } from "@/components/parity/views/favorites-navigation";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
@@ -19,6 +22,7 @@ import { VersionDisplay } from "@/components/version-display";
 import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const planning = usePlanningEnabled("projects");
   const { setOpenMobile } = useSidebar();
   const pathname = useLocation({ select: (location) => location.pathname });
 
@@ -36,17 +40,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
     >
       <SidebarHeader className="pt-1 pb-1.5">
-        <WorkspaceSwitcher />
+        <WorkspaceSwitcher planning={planning} />
       </SidebarHeader>
-      <SidebarContent className="overflow-hidden gap-1 py-1">
-        <NavMain />
-        <FavoritesNavigation />
-        <NavProjects />
+      <SidebarContent
+        className={
+          planning ? "overflow-y-auto gap-0 py-1" : "overflow-hidden gap-1 py-1"
+        }
+      >
+        {planning ? (
+          <PlanningNavigation />
+        ) : (
+          <>
+            <NavMain />
+            <FavoritesNavigation />
+            <NavProjects />
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavSecondary />
         <TrialCard />
         <div className="flex items-center justify-between">
+          {planning && <UserAvatar />}
           <VersionDisplay />
           <ThemeToggleDropdown />
         </div>

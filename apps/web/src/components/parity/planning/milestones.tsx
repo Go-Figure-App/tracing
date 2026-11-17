@@ -24,10 +24,12 @@ export function Milestones({
   projectId,
   milestones,
   canUpdate,
+  compact = false,
 }: {
   projectId: string;
   milestones: Milestone[];
   canUpdate: boolean;
+  compact?: boolean;
 }) {
   const { t } = useTranslation();
   const client = useQueryClient();
@@ -62,7 +64,7 @@ export function Milestones({
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold">
+        <h2 className={compact ? "sr-only" : "text-sm font-semibold"}>
           {t("parity:planning.milestones")}
         </h2>
         {canUpdate && (

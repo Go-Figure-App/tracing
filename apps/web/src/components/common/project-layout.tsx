@@ -1,3 +1,10 @@
+import { Link } from "@tanstack/react-router";
+import { PanelRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useProjectDetailsPreference } from "@/components/parity/planning/use-project-details-preference";
+import { ProjectDetails } from "@/components/parity/planning/project-details";
+import { FavoriteButton } from "@/components/parity/views/favorite-button";
+import { usePlanningEnabled } from "@/components/parity/planning/queries";
 import { ShortcutKeys } from "@/components/shortcuts/shortcut-keys";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useState } from "react";
@@ -53,6 +60,9 @@ export default function ProjectLayout({
   activeView,
 }: ProjectLayoutProps) {
   const { t } = useTranslation();
+  const planning = usePlanningEnabled("projects");
+  const [detailsOpen, setDetailsOpen] =
+    useProjectDetailsPreference(workspaceId);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: project, error: projectError } = useGetProject({
@@ -87,6 +97,13 @@ export default function ProjectLayout({
   useProjectViewShortcuts(goToView, currentView, showViews);
 
   const handleProjectSwitch = (nextProjectId: string) => {
+    if (location.pathname.endsWith("/updates")) {
+      navigate({
+        to: "/dashboard/workspace/$workspaceId/project/$projectId/updates",
+        params: { workspaceId, projectId: nextProjectId },
+      });
+      return;
+    }
     if (location.pathname.endsWith("/overview")) {
       navigate({
         to: "/dashboard/workspace/$workspaceId/project/$projectId/overview",
@@ -139,6 +156,13 @@ export default function ProjectLayout({
             />
           </div>
 
+          {planning && !unavailableReason && (
+            <FavoriteButton
+              workspaceId={workspaceId}
+              kind="project"
+              targetId={projectId}
+            />
+          )}
           <div className="min-w-0 md:hidden">
             <MobileProjectNav
               workspaceId={workspaceId}
@@ -155,7 +179,7 @@ export default function ProjectLayout({
         <TooltipProvider>
           <div
             className={cn(
-              "flex h-11 shrink-0 items-center gap-2.5 border-border/80 border-b px-2 sm:px-3",
+              "flex min-h-11 shrink-0 flex-wrap items-center gap-2 border-border/80 border-b px-2 py-1 sm:px-3",
               { "bg-card/80 backdrop-blur": !!background },
             )}
           >
@@ -163,7 +187,7 @@ export default function ProjectLayout({
               workspaceId={workspaceId}
               projectId={projectId}
             />
-            {showViewSwitcher && (
+            {showViewSwitcher && !planning && (
               <ProjectScopeToggle
                 workspaceId={workspaceId}
                 projectId={projectId}
@@ -173,7 +197,42 @@ export default function ProjectLayout({
             )}
             {summary}
             <div className="ml-auto flex shrink-0 items-center gap-1">
+              {planning && showViewSwitcher && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  render={
+                    <Link
+                      to="/dashboard/workspace/$workspaceId/project/$projectId/backlog"
+                      params={{ workspaceId, projectId }}
+                    />
+                  }
+                  aria-current={
+                    resolvedRoute === "backlog" ? "page" : undefined
+                  }
+                >
+                  {t("tasks:view.backlog")}
+                </Button>
+              )}
               {toolbar}
+              {planning && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-7"
+                  aria-label={t(
+                    detailsOpen
+                      ? "parity:planning.hideDetails"
+                      : "parity:planning.showDetails",
+                  )}
+                  aria-expanded={detailsOpen}
+                  aria-controls="project-details"
+                  onClick={() => setDetailsOpen(!detailsOpen)}
+                >
+                  <PanelRight className="size-4" />
+                </Button>
+              )}
             </div>
           </div>
           <div className={cn({ "bg-card/80 backdrop-blur": !!background })}>
@@ -189,7 +248,29 @@ export default function ProjectLayout({
             workspaceId={workspaceId}
           />
         ) : (
-          children
+          <div className="flex h-full min-h-0 min-w-0">
+            <div
+              className={cn(
+                "h-full min-w-0 flex-1",
+                planning && detailsOpen && "hidden xl:block",
+              )}
+            >
+              {children}
+            </div>
+            {planning && detailsOpen && (
+              <aside
+                id="project-details"
+                aria-label={t("parity:planning.properties")}
+                className="h-full w-full shrink-0 overflow-y-auto border-l border-border/60 bg-background xl:w-80"
+              >
+                <ProjectDetails
+                  key={projectId}
+                  workspaceId={workspaceId}
+                  projectId={projectId}
+                />
+              </aside>
+            )}
+          </div>
         )}
       </Layout.Content>
 

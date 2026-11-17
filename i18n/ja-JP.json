@@ -5461,7 +5461,14 @@
 			"searchProjects": "プロジェクトを検索",
 			"searchInitiatives": "イニシアチブを検索",
 			"allInitiatives": "すべてのイニシアチブ",
-			"properties": "プロパティ"
+			"properties": "プロパティ",
+			"showDetails": "詳細を表示",
+			"hideDetails": "詳細を非表示",
+			"projectNavigation": "プロジェクトナビゲーション",
+			"layout": "レイアウト",
+			"noHealthUpdates": "更新なし",
+			"issues": "課題",
+			"clear": "日付をクリア"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -5778,6 +5785,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "自分の課題",
+			"newIssue": "新しい課題"
 		}
 	}
 }

@@ -10,6 +10,7 @@ export type ProjectColumn =
   | "priority"
   | "lead"
   | "targetDate"
+  | "issues"
   | "progress"
   | "status";
 export const projectColumns: ProjectColumn[] = [
@@ -17,6 +18,7 @@ export const projectColumns: ProjectColumn[] = [
   "priority",
   "lead",
   "targetDate",
+  "issues",
   "progress",
   "status",
 ];
@@ -62,3 +64,7 @@ export function selectProjects(
       );
     });
 }
+
+export const defaultProjectColumns = projectColumns.filter(
+  (column) => column !== "progress",
+);

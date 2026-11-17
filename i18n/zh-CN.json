@@ -5461,7 +5461,14 @@
 			"searchProjects": "搜索项目",
 			"searchInitiatives": "搜索计划",
 			"allInitiatives": "所有计划",
-			"properties": "属性"
+			"properties": "属性",
+			"showDetails": "显示详情",
+			"hideDetails": "隐藏详情",
+			"projectNavigation": "项目导航",
+			"layout": "布局",
+			"noHealthUpdates": "暂无更新",
+			"issues": "事项",
+			"clear": "清除日期"
 		},
 		"roadmap": {
 			"title": "Roadmap",
@@ -5778,6 +5785,10 @@
 		"import": {
 			"description": "Projects, initiatives, milestones, cycles, estimates and original issue IDs, with issues and comments.",
 			"intro": "Each Linear project becomes a new project. Issues without a project go into one catch-all per team. Linked initiatives and team cycles are included; selecting everything also includes initiatives without projects. Historical burndown is unavailable. Repeating an import creates another copy."
+		},
+		"navigation": {
+			"myIssues": "我的事项",
+			"newIssue": "新建事项"
 		}
 	}
 }

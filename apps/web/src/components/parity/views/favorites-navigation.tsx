@@ -1,6 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { ArrowDown, ArrowUp, MoreHorizontal, Star, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Box,
+  Flag,
+  Layers,
+  MoreHorizontal,
+  X,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +76,12 @@ export function FavoritesNavigation() {
       <SidebarMenu className="max-h-60 overflow-y-auto">
         {items.map((item, index) => {
           const url = favoriteLocation(workspaceId, item);
+          const Icon =
+            item.kind === "project"
+              ? Box
+              : item.kind === "initiative"
+                ? Flag
+                : Layers;
           return (
             <SidebarMenuItem
               key={`${item.kind}:${item.targetId}`}
@@ -77,9 +91,9 @@ export function FavoritesNavigation() {
                 tooltip={item.title}
                 isActive={location.pathname === url}
                 onClick={() => navigate({ to: url })}
-                className="min-w-0 flex-1"
+                className="h-7 min-w-0 flex-1 rounded-md text-[13px] data-[active=true]:bg-none data-[active=true]:bg-sidebar-accent data-[active=true]:shadow-none"
               >
-                <Star className="size-4" aria-hidden="true" />
+                <Icon className="size-3.5" aria-hidden="true" />
                 <span>{item.title}</span>
               </SidebarMenuButton>
               <Popover>

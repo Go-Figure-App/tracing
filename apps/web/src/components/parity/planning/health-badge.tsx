@@ -1,12 +1,22 @@
+import { useTranslation } from "react-i18next";
+import { CircleDashed } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { usePlanningLabels } from "./labels";
 
 export function HealthBadge({
   health,
 }: {
-  health: "on_track" | "at_risk" | "off_track";
+  health: "on_track" | "at_risk" | "off_track" | null;
 }) {
   const labels = usePlanningLabels();
+  const { t } = useTranslation();
+  if (!health)
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+        <CircleDashed aria-hidden="true" className="size-3.5" />
+        {t("parity:planning.noHealthUpdates")}
+      </span>
+    );
   return (
     <span
       className={cn("inline-flex items-center gap-1.5 text-xs", {
