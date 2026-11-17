@@ -1181,3 +1181,8 @@ mobile 159, MCP 107), all 22 focused Teams/auth/import PostgreSQL tests passed,
 and the expanded Teams browser flow passed, including a synthetic failed
 assignment/retry and deletion recovery in another browser. Root types/build graph
 and lint/format passed again. No production flags or deployment were changed.
+
+A final review additionally covered flag toggling: move cleanup always clears a
+stored assignment, including while Teams is disabled, so an A→B→A round trip
+cannot resurrect it after re-enabling the feature. Both flag states pass the real
+controller regression; all fourteen core Teams integration tests pass.
