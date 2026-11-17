@@ -94,7 +94,7 @@ describe("Teams design spike: existing Better Auth contract", () => {
   });
 
   it("creates a default team, owner membership and active team with each workspace", async () => {
-    const { owner, team } = await fixture();
+    const { app, owner, team } = await fixture();
     expect(team).toMatchObject({ name: "Teams spike", memberCount: 1 });
     expect(await db.select().from(schema.teamMemberTable)).toMatchObject([
       {
@@ -103,12 +103,13 @@ describe("Teams design spike: existing Better Auth contract", () => {
         membershipKey: expect.any(String),
       },
     ]);
-    expect(
-      await db
-        .select({ activeTeamId: schema.sessionTable.activeTeamId })
-        .from(schema.sessionTable)
-        .where(eq(schema.sessionTable.userId, owner.userId)),
-    ).toContainEqual({ activeTeamId: team.id });
+    const session = await app.request("/api/auth/get-session", {
+      headers: { cookie: owner.cookies },
+    });
+    expect(session.status).toBe(200);
+    expect(await session.json()).toMatchObject({
+      session: { activeTeamId: team.id },
+    });
   });
 
   it("counts the default team toward the ten-team limit", async () => {
