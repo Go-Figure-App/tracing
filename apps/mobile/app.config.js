@@ -5,7 +5,7 @@ module.exports = ({ config }) => ({
   name: "Tracing",
   slug: "tracing",
   scheme: ["tracing", "kaneo"],
-  owner: process.env.GOFIGURE_EXPO_OWNER || "gofigure",
+  owner: process.env.GOFIGURE_EXPO_OWNER || "tracing",
   ios: {
     ...config.ios,
     bundleIdentifier: "io.gofigureapp.tracing",
