@@ -71,7 +71,12 @@ test("cycle settings, task properties, filters and bulk edits stay in sync", asy
   const observer = await context.newPage();
   await observer.goto(`${path}/cycles`);
   await expect(observer.getByText("0 points", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Cycle launch", exact: true }).click();
+  await page.getByRole("link", { name: "Projects", exact: true }).click();
+  await page.getByRole("link", { name: "Cycle launch", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Project navigation" })
+    .getByRole("link", { name: "Issues", exact: true })
+    .click();
   // Visit the task through the board so returning to Cycles reuses its cache.
   await expect(page).toHaveURL(new RegExp(`${board}$`));
   await page
@@ -94,7 +99,12 @@ test("cycle settings, task properties, filters and bulk edits stay in sync", asy
   await expect(page.getByText("5 points", { exact: true })).toBeVisible();
   await expect(page.getByText(task.title, { exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: "Cycle launch", exact: true }).click();
+  await page.getByRole("link", { name: "Projects", exact: true }).click();
+  await page.getByRole("link", { name: "Cycle launch", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Project navigation" })
+    .getByRole("link", { name: "Issues", exact: true })
+    .click();
   await expect(page).toHaveURL(new RegExp(`${board}$`));
   const card = page.locator(`[data-task-id="${task.id}"]`);
   await expect(card).toBeVisible();
