@@ -290,6 +290,76 @@ Store/TestFlight submission remains a separate step from build generation.
 - Target fewer than 20 shared integration edits. Record generated locale synchronization separately and count it in the total; upstream's required locale check needs every catalog to contain the source keys. Ask before a large change to a shared file or a design/model change.
 - No Railway changes, production migration/import, paid services, TestFlight or App Store submission without explicit permission. The maintainer authorized review fixes, merging approved green PRs, and continuing to the next phase; deployment remains separate.
 
+## Native glass navigation — November 2026
+
+The maintainer supplied eight Linear iOS screenshots and requested native glass
+navigation. The installed Expo SDK 58 Router exposes `expo-router/native-tabs`;
+the new home layout uses the native system tab bar with icon-only iOS labels,
+accessible destination names, the current-tab capsule and an unread badge.
+The system supplies glass on supported iOS versions and its normal tab bar on
+older systems. No native package or generated native project is changed.
+
+Home, My tasks, Inbox and More remain the four destinations. More retains
+Activity when planning is disabled. Its nested stack keeps the bar visible on
+Projects, Initiatives, Cycles, Roadmap, Views, Insights and Activity. Existing
+collection URLs remain unchanged. Root project/issue/detail, creation, search
+and account routes retain their outer stack. Shared workspace/realtime handling
+mounts once; changing workspace remounts tab state and counts. Other tabs load
+their content on first visit and retain it for later visits. No-workspace,
+loading and failure handling remain available, including direct Activity links.
+
+The reference's custom expanding destination slot and separate Agent action
+are not implemented. Tracing retains its current destinations and workflows.
+The screenshots stay outside Git and PR attachments. The real native system
+owns selection, glass, insets and platform fallbacks rather than a simulated
+blurred React Native view. ThemeProvider follows the device appearance to avoid
+white transitions in dark mode.
+
+Shared-file register: `apps/mobile/src/app/(app)/_layout.tsx` mounts the nested
+tabs; its old `index.tsx` is split into thin tab routes and owned
+`features/parity/navigation` components. The six existing collection routes
+(`projects`, `initiatives`, `cycles`, `roadmap`, `views`, `insights`) move unchanged
+inside the nested collections stack, preserving public paths. The unused
+`features/home/bottom-nav.tsx` is removed. New Activity and layout files are thin
+mounts. The shared catalogs, API, permissions, data model, native identity and
+dependencies are unchanged by this slice; Expo ownership is the separately
+approved PR #23.
+
+`components/sheet.tsx` keeps the native Modal host mounted through dismissal
+and exposes its existing native dismissal callback. `features/home/workspace-sheet.tsx`
+waits for that callback before iOS workspace actions navigate. The simulator
+found that pushing a parent-stack route while a tab's modal was still closing
+could leave the modal over the destination. Other platforms retain their
+existing navigation sequence. The collections layout explicitly owns its bottom
+safe area so a horizontal filter scroller cannot receive the vertical list's
+tab-bar inset.
+
+Verification: root lint/format, all 22 typecheck/build tasks, all 158 native unit
+tests, all 2,066 web tests, locale synchronization and unchanged OpenAPI passed.
+The workspace unit run hit the two previously observed five-second API import
+timeouts under concurrent local load; their unchanged files passed all 11 cases
+when run alone. The final iOS production JavaScript export passed with the local
+server override unset. Other workspace unit packages passed in the root run.
+
+The Tracing UI QA iPhone simulator (iOS 27) exercised all four tabs, unread
+badges, collection navigation with the bar retained, scrolling to the final
+project row, project detail/back, new-workspace creation with the keyboard,
+empty-state isolation, restoring the original workspace, and light/dark search
+and detail navigation. Maestro drove the disposable local instance after the
+computer-use surface could not access Simulator. Assertions were corrected to
+match combined accessibility labels and the localized ellipsis; the navigation
+and modal fixes were then verified through the corrected flows. No physical
+device, older iOS runtime or distribution binary was exercised in this slice.
+
+Review correction: render the unread badge only for positive counts. The locked
+Router version processes nonempty badge children before its `hidden` property,
+so a hidden badge containing `"0"` would still appear. Positive counts and the
+`99+` cap are retained.
+
+The Teams core changes are parked until this PR is approved, green and merged,
+as requested by the maintainer. Distribution builds are iOS only; production
+API enablement and store submission remain separate.
+
 ## Phase 0 spike findings
 
 Validated against upstream `cb70ff64` (v2.49.0), with the existing Go Figure mobile identity commit `104f1f6f` preserved.
