@@ -14,12 +14,15 @@ const get = createRoute({
   summary:
     "Get readable project plans, initiative groups and milestones for a workspace timeline",
   middleware: [requireParity("roadmap"), ...readWorkspace],
-  request: { params: z.object({ workspaceId: id }) },
+  request: {
+    params: z.object({ workspaceId: id }),
+    query: z.object({ team: id.optional() }),
+  },
   responses: {
     200: jsonResponse("Workspace roadmap", roadmapSchema),
     ...errors,
   },
 });
 export default apiRouter().openapi(get, async (c) =>
-  c.json(await getRoadmap(actor(c)), 200),
+  c.json(await getRoadmap(actor(c), c.req.valid("query").team), 200),
 );

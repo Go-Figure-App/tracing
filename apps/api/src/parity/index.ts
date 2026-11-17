@@ -30,6 +30,7 @@ import workspaceTasks from "./views/task-routes";
 import savedViews from "./views/view-routes";
 import favorites from "./views/favorite-routes";
 import templates from "./views/template-routes";
+import teams from "./teams";
 
 const categorySchema = z.enum(categories);
 const columnSchema = z.object({
@@ -110,6 +111,7 @@ const updateRoute = createRoute({
 });
 
 export default apiRouter()
+  .route("/teams", teams)
   .route("/tasks", workspaceTasks)
   .route("/views", savedViews)
   .route("/favorites", favorites)

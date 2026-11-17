@@ -1,3 +1,5 @@
+import { Users } from "lucide-react";
+import { usePlanningEnabled } from "@/components/parity/planning/queries";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { buildSettingsNav } from "@/components/settings/nav/build-settings-nav";
@@ -18,6 +20,7 @@ export function useSettingsNav() {
   const { permissions: adminPermissions } = useAdminAccess();
   const { canImport } = useCanImport();
   const triageEnabled = useTriageEnabled();
+  const teamsEnabled = usePlanningEnabled("teams");
 
   return useMemo(() => {
     const nav = buildSettingsNav({
@@ -28,6 +31,13 @@ export function useSettingsNav() {
       adminPermissions,
       projects: projects ?? [],
     });
+    if (teamsEnabled)
+      nav.workspace.links.push({
+        id: "workspace-teams",
+        label: t("parity:teams.title"),
+        to: "/dashboard/settings/workspace/teams",
+        icon: Users,
+      });
     if (triageEnabled)
       for (const project of nav.projects)
         project.links.push({
@@ -44,5 +54,6 @@ export function useSettingsNav() {
     adminPermissions,
     projects,
     triageEnabled,
+    teamsEnabled,
   ]);
 }

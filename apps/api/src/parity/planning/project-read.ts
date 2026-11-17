@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import { projectTable, userTable } from "../../database/schema";
@@ -10,11 +10,19 @@ import { readableProjects, type Actor } from "./access";
 import { emptyCounts, progress } from "./progress";
 import { estimatesEnabled, progressCounts } from "./progress-query";
 import { latestUpdates } from "./status-updates";
+import { enabledFeatures } from "../foundation/features";
+import {
+  projectTeamCondition,
+  projectTeamId,
+  validateTeamFilter,
+} from "../teams/project-filter";
 
 export async function projectSummaries(who: Actor, ids?: string[]) {
   if (ids?.length === 0) return [];
+  const teams = enabledFeatures().includes("teams");
   const rows = await db
     .select({
+      teamId: teams ? projectTeamId : sql<null>`null`,
       id: projectTable.id,
       workspaceId: projectTable.workspaceId,
       name: projectTable.name,
@@ -46,8 +54,9 @@ export async function projectSummaries(who: Actor, ids?: string[]) {
     latestUpdates("project", projectIds),
   ]);
   const latest = new Map(updates.map((update) => [update.parentId, update]));
-  return rows.map((row) => ({
+  return rows.map(({ teamId, ...row }) => ({
     ...row,
+    ...(teams ? { teamId } : {}),
     status: row.status ?? ("backlog" as const),
     health: row.health ?? ("on_track" as const),
     priority: row.priority ?? ("no-priority" as const),
@@ -60,11 +69,13 @@ export async function listProjectPlans(
   who: Actor,
   page: number,
   pageSize: number,
+  team?: string,
 ) {
+  await validateTeamFilter(who, team);
   const ids = await db
     .select({ id: projectTable.id })
     .from(projectTable)
-    .where(readableProjects(who))
+    .where(and(readableProjects(who), projectTeamCondition(team)))
     .orderBy(asc(projectTable.name), asc(projectTable.id))
     .limit(pageSize + 1)
     .offset((page - 1) * pageSize);

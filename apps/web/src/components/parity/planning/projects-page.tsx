@@ -1,3 +1,4 @@
+import { TeamFilter } from "../teams/team-filter";
 import { uniquePageItems } from "./unique-page-items";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -42,11 +43,13 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
   );
   const [layout, setLayout] = useState<"list" | "board">("list");
   const [search, setSearch] = useState("");
+  const [team, setTeam] = useState("");
   const [status, setStatus] = useState("");
   const query = useInfiniteQuery({
-    queryKey: ["parity", "project-plans", workspaceId],
+    queryKey: ["parity", "project-plans", workspaceId, team],
     initialPageParam: 1,
-    queryFn: ({ pageParam }) => getProjectPlans(workspaceId, pageParam),
+    queryFn: ({ pageParam }) =>
+      getProjectPlans(workspaceId, pageParam, team || undefined),
     getNextPageParam: (page) => (page.hasMore ? page.page + 1 : undefined),
   });
   // Collection controls must include every authorized page, not only the first.
@@ -110,6 +113,11 @@ export function PlanningProjectsPage({ workspaceId }: { workspaceId: string }) {
               className="h-8 min-w-0 w-full bg-transparent text-xs outline-none"
             />
           </label>
+          <TeamFilter
+            workspaceId={workspaceId}
+            value={team}
+            onChange={setTeam}
+          />
           <Popover>
             <PopoverTrigger asChild>
               <Button

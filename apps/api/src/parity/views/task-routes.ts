@@ -56,6 +56,7 @@ const options = createRoute({
     200: jsonResponse(
       "Filter choices",
       z.object({
+        teams: z.array(z.object({ id, name: z.string() })).optional(),
         states: z.array(z.object({ name: z.string() })),
         initiatives: z.array(z.object({ id, name: z.string() })),
         projects: z.array(z.object({ id, name: z.string() })),

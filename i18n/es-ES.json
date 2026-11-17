@@ -5522,6 +5522,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Equipos",
+				"team": "Equipo",
+				"noTeam": "Sin equipo",
+				"issues": "Tareas",
+				"projects": "Proyectos",
+				"archived": "Archivado",
+				"notFound": "Equipo no encontrado",
+				"empty": "Todavía no hay equipos"
 			}
 		}
 	},
@@ -5939,7 +5949,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Período del ciclo",
 				"initiative": "Iniciativa",
-				"state": "Estado del flujo de trabajo"
+				"state": "Estado del flujo de trabajo",
+				"team": "Equipo"
 			},
 			"groups": {
 				"state": "State",
@@ -5976,6 +5987,38 @@
 		"navigation": {
 			"myIssues": "Mis incidencias",
 			"newIssue": "Nueva incidencia"
+		},
+		"teams": {
+			"title": "Equipos",
+			"team": "Equipo",
+			"yourTeams": "Tus equipos",
+			"all": "Todos los equipos",
+			"noTeam": "Sin equipo",
+			"create": "Crear equipo",
+			"edit": "Editar equipo",
+			"name": "Nombre",
+			"key": "Clave",
+			"description": "Descripción",
+			"icon": "Icono",
+			"color": "Color",
+			"leadId": "Responsable",
+			"organizeOnly": "Los equipos organizan el trabajo. La visibilidad de los proyectos no cambia.",
+			"members": "Miembros",
+			"noMembers": "Todavía no hay miembros",
+			"selectMember": "Selecciona un miembro del espacio de trabajo",
+			"addMember": "Añadir miembro",
+			"removeMember": "Quitar miembro",
+			"issues": "Tareas",
+			"projects": "Proyectos",
+			"settings": "Ajustes",
+			"archived": "Archivado",
+			"restore": "Restaurar equipo",
+			"archive": "Archivar equipo",
+			"delete": "Eliminar equipo",
+			"deleteWarning": "¿Eliminar este equipo? Se conservarán todos los proyectos y tareas y quedarán sin equipo.",
+			"notFound": "Equipo no encontrado",
+			"empty": "Todavía no hay equipos",
+			"counts": "{{members}} miembros · {{projects}} proyectos"
 		}
 	}
 }

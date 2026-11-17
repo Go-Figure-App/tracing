@@ -10,9 +10,13 @@ import { findInitiative, readableProjects, type Actor } from "./access";
 import { addCounts, progress } from "./progress";
 import { estimatesEnabled } from "./progress-query";
 import { projectSummaries } from "./project-read";
+import {
+  projectTeamCondition,
+  validateTeamFilter,
+} from "../teams/project-filter";
 import { latestUpdates } from "./status-updates";
 
-export async function linkedProjects(ids: string[], who: Actor) {
+export async function linkedProjects(ids: string[], who: Actor, team?: string) {
   if (!ids.length) return [];
   return db
     .select({
@@ -32,7 +36,13 @@ export async function linkedProjects(ids: string[], who: Actor) {
         eq(initiativeTable.workspaceId, projectTable.workspaceId),
       ),
     )
-    .where(and(inArray(initiativeTable.id, ids), readableProjects(who)))
+    .where(
+      and(
+        inArray(initiativeTable.id, ids),
+        readableProjects(who),
+        projectTeamCondition(team),
+      ),
+    )
     .orderBy(asc(initiativeProjectTable.position), asc(projectTable.id));
 }
 
@@ -114,12 +124,13 @@ export async function listInitiatives(
   };
 }
 
-export async function getInitiative(id: string, who: Actor) {
+export async function getInitiative(id: string, who: Actor, team?: string) {
   await findInitiative(id, who);
+  await validateTeamFilter(who, team);
   const [initiative] = await summaries([id], who);
   if (!initiative)
     throw new HTTPException(404, { message: "Initiative not found" });
-  const links = await linkedProjects([id], who);
+  const links = await linkedProjects([id], who, team);
   const projects = await projectSummaries(
     who,
     links.map((link) => link.projectId),

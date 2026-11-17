@@ -5337,6 +5337,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "チーム",
+				"team": "チーム",
+				"noTeam": "チームなし",
+				"issues": "課題",
+				"projects": "プロジェクト",
+				"archived": "アーカイブ済み",
+				"notFound": "チームが見つかりません",
+				"empty": "チームはまだありません"
 			}
 		}
 	},
@@ -5752,7 +5762,8 @@
 				"completed": "Completed date",
 				"cycle-period": "サイクル期間",
 				"initiative": "イニシアチブ",
-				"state": "ワークフローのステータス"
+				"state": "ワークフローのステータス",
+				"team": "チーム"
 			},
 			"groups": {
 				"state": "State",
@@ -5789,6 +5800,38 @@
 		"navigation": {
 			"myIssues": "自分の課題",
 			"newIssue": "新しい課題"
+		},
+		"teams": {
+			"title": "チーム",
+			"team": "チーム",
+			"yourTeams": "自分のチーム",
+			"all": "すべてのチーム",
+			"noTeam": "チームなし",
+			"create": "チームを作成",
+			"edit": "チームを編集",
+			"name": "名前",
+			"key": "キー",
+			"description": "説明",
+			"icon": "アイコン",
+			"color": "色",
+			"leadId": "リーダー",
+			"organizeOnly": "チームは作業を整理します。プロジェクトの公開範囲は変わりません。",
+			"members": "メンバー",
+			"noMembers": "メンバーはまだいません",
+			"selectMember": "ワークスペースのメンバーを選択",
+			"addMember": "メンバーを追加",
+			"removeMember": "メンバーを削除",
+			"issues": "課題",
+			"projects": "プロジェクト",
+			"settings": "設定",
+			"archived": "アーカイブ済み",
+			"restore": "チームを復元",
+			"archive": "チームをアーカイブ",
+			"delete": "チームを削除",
+			"deleteWarning": "このチームを削除しますか？すべてのプロジェクトと課題は保持され、チームなしになります。",
+			"notFound": "チームが見つかりません",
+			"empty": "チームはまだありません",
+			"counts": "メンバー {{members}} 人 · プロジェクト {{projects}} 件"
 		}
 	}
 }

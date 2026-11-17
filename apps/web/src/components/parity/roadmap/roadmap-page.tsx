@@ -1,3 +1,4 @@
+import { TeamFilter } from "../teams/team-filter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -40,11 +41,12 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
   const client = useQueryClient();
   const [anchor, setAnchor] = useState(() => new Date());
   const [zoom, setZoom] = useState<Zoom>("quarter");
+  const [team, setTeam] = useState("");
   const [filters, setFilters] = useState(emptyFilters);
   const [editingId, setEditingId] = useState<string | null>(null);
   const query = useQuery({
-    queryKey: ["parity", "roadmap", workspaceId],
-    queryFn: () => getRoadmap(workspaceId),
+    queryKey: ["parity", "roadmap", workspaceId, team],
+    queryFn: () => getRoadmap(workspaceId, team || undefined),
     enabled,
   });
   const mutation = useMutation({
@@ -131,6 +133,11 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
                 ))}
               </select>
             </div>
+            <TeamFilter
+              workspaceId={workspaceId}
+              value={team}
+              onChange={setTeam}
+            />
             {data && (
               <RoadmapFilters
                 data={data}

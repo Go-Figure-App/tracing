@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Teams",
+				"team": "Team",
+				"noTeam": "Geen team",
+				"issues": "Taken",
+				"projects": "Projecten",
+				"archived": "Gearchiveerd",
+				"notFound": "Team niet gevonden",
+				"empty": "Nog geen teams"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Cyclusperiode",
 				"initiative": "Initiatief",
-				"state": "Workflowstatus"
+				"state": "Workflowstatus",
+				"team": "Team"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "Mijn issues",
 			"newIssue": "Nieuw issue"
+		},
+		"teams": {
+			"title": "Teams",
+			"team": "Team",
+			"yourTeams": "Jouw teams",
+			"all": "Alle teams",
+			"noTeam": "Geen team",
+			"create": "Team maken",
+			"edit": "Team bewerken",
+			"name": "Naam",
+			"key": "Sleutel",
+			"description": "Beschrijving",
+			"icon": "Pictogram",
+			"color": "Kleur",
+			"leadId": "Teamleider",
+			"organizeOnly": "Teams organiseren het werk. De zichtbaarheid van projecten blijft gelijk.",
+			"members": "Leden",
+			"noMembers": "Nog geen leden",
+			"selectMember": "Selecteer een lid van de werkruimte",
+			"addMember": "Lid toevoegen",
+			"removeMember": "Lid verwijderen",
+			"issues": "Taken",
+			"projects": "Projecten",
+			"settings": "Instellingen",
+			"archived": "Gearchiveerd",
+			"restore": "Team herstellen",
+			"archive": "Team archiveren",
+			"delete": "Team verwijderen",
+			"deleteWarning": "Dit team verwijderen? Alle projecten en taken blijven behouden en worden aan geen team toegewezen.",
+			"notFound": "Team niet gevonden",
+			"empty": "Nog geen teams",
+			"counts": "{{members}} leden · {{projects}} projecten"
 		}
 	}
 }

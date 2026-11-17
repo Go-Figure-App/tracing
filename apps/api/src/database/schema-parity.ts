@@ -18,6 +18,7 @@ import {
   columnTable,
   projectTable,
   taskTable,
+  teamTable,
   userTable,
   workspaceTable,
 } from "./schema";
@@ -78,6 +79,33 @@ export const taskExtTable = pgTable(
   ],
 );
 
+export const teamExtTable = pgTable(
+  "team_ext",
+  {
+    teamId: text("team_id")
+      .primaryKey()
+      .references(() => teamTable.id, { onDelete: "cascade" }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    description: text("description").notNull().default(""),
+    icon: text("icon"),
+    color: text("color"),
+    leadId: text("lead_id").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    position: integer("position").notNull().default(0),
+  },
+  (table) => [
+    uniqueIndex("team_ext_workspace_key_idx").on(table.workspaceId, table.key),
+    index("team_ext_lead_id_idx").on(table.leadId),
+    check("team_ext_key_check", sql`${table.key} ~ '^[A-Z]{2,5}$'`),
+    check("team_ext_position_check", sql`${table.position} >= 0`),
+  ],
+);
+
 export const projectExtTable = pgTable(
   "project_ext",
   {
@@ -87,6 +115,9 @@ export const projectExtTable = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
+    teamId: text("team_id").references(() => teamTable.id, {
+      onDelete: "set null",
+    }),
     status: text("status")
       .$type<
         "backlog" | "planned" | "started" | "paused" | "completed" | "canceled"
@@ -115,6 +146,7 @@ export const projectExtTable = pgTable(
     intakeToken: text("intake_token").unique(),
   },
   (table) => [
+    index("project_ext_team_id_idx").on(table.teamId),
     check(
       "project_ext_status_check",
       sql`${table.status} IN ('backlog', 'planned', 'started', 'paused', 'completed', 'canceled')`,

@@ -10,13 +10,14 @@ export const viewsApi = {
     request<SavedView>(
       `api/parity/views/${encodeURIComponent(workspaceId)}/${encodeURIComponent(id)}`,
     ),
-  tasks: (workspaceId: string, page = 1, view?: SavedView) =>
+  tasks: (workspaceId: string, page = 1, view?: SavedView, team?: string) =>
     request<Page<WorkspaceIssue> & { timeZone: string }>(
       `api/parity/tasks/${encodeURIComponent(workspaceId)}`,
       {
         query: {
           page,
           pageSize: 50,
+          ...(team ? { team } : {}),
           ...(view
             ? {
                 filters: JSON.stringify(view.filters),

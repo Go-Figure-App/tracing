@@ -54,6 +54,9 @@ export function registerViewTools(server: ToolRegistrar, client: ToolClient) {
       ...page,
       filters: viewFilters.optional(),
       projectId: id.optional(),
+      team: id
+        .optional()
+        .describe("Team ID, or none for No team; requires teams"),
       search: z.string().trim().max(200).optional(),
       orderBy: z.enum(["priority", "created", "updated", "due"]).optional(),
       direction: z.enum(["asc", "desc"]).optional(),

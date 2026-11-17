@@ -26,10 +26,12 @@ export function IssuesBrowser({
   workspaceId,
   view,
   resetVersion = 0,
+  teamId,
 }: {
   workspaceId: string;
   view?: SavedView;
   resetVersion?: number;
+  teamId?: string;
 }) {
   const { t } = useTranslation();
   const client = useQueryClient();
@@ -62,7 +64,10 @@ export function IssuesBrowser({
     view?.projectId ?? filteredProjectId,
   );
 
-  const valid = validFilters(filters);
+  const scopedFilters: ViewFilters = teamId
+    ? [...filters, { field: "team", operator: "is", values: [teamId] }]
+    : filters;
+  const valid = validFilters(scopedFilters);
   const query = useInfiniteQuery({
     queryKey: [
       "parity",
@@ -74,12 +79,14 @@ export function IssuesBrowser({
       display.includeArchivedProjects,
       deferredSearch,
       view?.projectId,
+      teamId,
     ],
     queryFn: ({ pageParam }) =>
       getWorkspaceTasks(workspaceId, {
         page: String(pageParam),
         pageSize: "100",
-        filters: JSON.stringify(filters),
+        ...(teamId ? { team: teamId } : {}),
+        filters: JSON.stringify(scopedFilters),
         search: deferredSearch,
         projectId: view?.projectId ?? undefined,
         orderBy: display.orderBy,
@@ -155,6 +162,7 @@ export function IssuesBrowser({
         </Button>
       </div>
       <FilterBuilder
+        limit={teamId ? 29 : 30}
         filters={filters}
         onChange={setFilters}
         options={options.isError ? undefined : options.data}
@@ -232,7 +240,7 @@ export function IssuesBrowser({
             icon: view?.icon,
             projectId: view?.projectId,
             shared: false,
-            filters,
+            filters: scopedFilters,
             display,
           }}
           onClose={() => setSavingCopy(false)}

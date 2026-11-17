@@ -10,6 +10,11 @@ import { roleHasWorkspacePermission } from "../../utils/require-workspace-permis
 import { broadcastToUser } from "../../ws";
 
 export const workspaceEventTypes = [
+  "TEAM_CREATED",
+  "TEAM_UPDATED",
+  "TEAM_DELETED",
+  "TEAM_MEMBERSHIP_UPDATED",
+  "PROJECT_TEAM_UPDATED",
   "INITIATIVE_UPDATED",
   "PROJECT_PLAN_UPDATED",
   "CYCLE_UPDATED",

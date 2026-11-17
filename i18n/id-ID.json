@@ -5337,6 +5337,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Tim",
+				"team": "Tim",
+				"noTeam": "Tanpa tim",
+				"issues": "Tugas",
+				"projects": "Proyek",
+				"archived": "Diarsipkan",
+				"notFound": "Tim tidak ditemukan",
+				"empty": "Belum ada tim"
 			}
 		}
 	},
@@ -5752,7 +5762,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Periode siklus",
 				"initiative": "Inisiatif",
-				"state": "Status alur kerja"
+				"state": "Status alur kerja",
+				"team": "Tim"
 			},
 			"groups": {
 				"state": "State",
@@ -5789,6 +5800,38 @@
 		"navigation": {
 			"myIssues": "Isu saya",
 			"newIssue": "Isu baru"
+		},
+		"teams": {
+			"title": "Tim",
+			"team": "Tim",
+			"yourTeams": "Tim Anda",
+			"all": "Semua tim",
+			"noTeam": "Tanpa tim",
+			"create": "Buat tim",
+			"edit": "Edit tim",
+			"name": "Nama",
+			"key": "Kode",
+			"description": "Deskripsi",
+			"icon": "Ikon",
+			"color": "Warna",
+			"leadId": "Pemimpin",
+			"organizeOnly": "Tim mengatur pekerjaan. Visibilitas proyek tidak berubah.",
+			"members": "Anggota",
+			"noMembers": "Belum ada anggota",
+			"selectMember": "Pilih anggota ruang kerja",
+			"addMember": "Tambah anggota",
+			"removeMember": "Hapus anggota",
+			"issues": "Tugas",
+			"projects": "Proyek",
+			"settings": "Pengaturan",
+			"archived": "Diarsipkan",
+			"restore": "Pulihkan tim",
+			"archive": "Arsipkan tim",
+			"delete": "Hapus tim",
+			"deleteWarning": "Hapus tim ini? Semua proyek dan tugas akan dipertahankan dan menjadi tanpa tim.",
+			"notFound": "Tim tidak ditemukan",
+			"empty": "Belum ada tim",
+			"counts": "{{members}} anggota · {{projects}} proyek"
 		}
 	}
 }

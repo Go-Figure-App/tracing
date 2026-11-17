@@ -19,3 +19,21 @@ it("uses workspace events as planning refetch hints", () => {
   ).toBeUndefined();
   client.clear();
 });
+
+it("refetches teams and derived collections for every team hint", () => {
+  for (const type of [
+    "TEAM_CREATED",
+    "TEAM_UPDATED",
+    "TEAM_DELETED",
+    "TEAM_MEMBERSHIP_UPDATED",
+    "PROJECT_TEAM_UPDATED",
+  ]) {
+    const client = new QueryClient();
+    client.setQueryData(["parity", "teams", "workspace"], []);
+    invalidateParity(client, { type });
+    expect(
+      client.getQueryState(["parity", "teams", "workspace"])?.isInvalidated,
+    ).toBe(true);
+    client.clear();
+  }
+});

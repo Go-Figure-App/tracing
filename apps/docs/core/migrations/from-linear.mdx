@@ -55,3 +55,11 @@ Invite your team to the Tracing workspace first. Assignees are matched by email,
 **A team is missing from the list**: the key only sees teams your Linear account can see.
 
 **Tasks are unassigned**: the assignee's Linear email must match a member of the Tracing workspace. Invite them, delete the imported project, and import it again, or assign the tasks by hand.
+
+
+When Teams is enabled alongside import, a source project's single Linear team
+is reused or created as a Tracing organizing team with its name and key. No
+members are merged. If a source project belongs to multiple teams, it remains
+**No team** with an import warning. Invalid or conflicting keys receive a unique
+destination key; archived destination teams and the ten-team limit also produce
+a warning and leave ownership unset. Existing project visibility is preserved.

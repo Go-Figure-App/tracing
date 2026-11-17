@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Teams",
+				"team": "Team",
+				"noTeam": "Kein Team",
+				"issues": "Aufgaben",
+				"projects": "Projekte",
+				"archived": "Archiviert",
+				"notFound": "Team nicht gefunden",
+				"empty": "Noch keine Teams"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Zykluszeitraum",
 				"initiative": "Initiative",
-				"state": "Workflow-Status"
+				"state": "Workflow-Status",
+				"team": "Team"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "Meine Issues",
 			"newIssue": "Neues Issue"
+		},
+		"teams": {
+			"title": "Teams",
+			"team": "Team",
+			"yourTeams": "Deine Teams",
+			"all": "Alle Teams",
+			"noTeam": "Kein Team",
+			"create": "Team erstellen",
+			"edit": "Team bearbeiten",
+			"name": "Name",
+			"key": "Kürzel",
+			"description": "Beschreibung",
+			"icon": "Symbol",
+			"color": "Farbe",
+			"leadId": "Leitung",
+			"organizeOnly": "Teams organisieren die Arbeit. Die Sichtbarkeit der Projekte bleibt unverändert.",
+			"members": "Mitglieder",
+			"noMembers": "Noch keine Mitglieder",
+			"selectMember": "Mitglied des Arbeitsbereichs auswählen",
+			"addMember": "Mitglied hinzufügen",
+			"removeMember": "Mitglied entfernen",
+			"issues": "Aufgaben",
+			"projects": "Projekte",
+			"settings": "Einstellungen",
+			"archived": "Archiviert",
+			"restore": "Team wiederherstellen",
+			"archive": "Team archivieren",
+			"delete": "Team löschen",
+			"deleteWarning": "Dieses Team löschen? Alle Projekte und Aufgaben bleiben erhalten und werden keinem Team zugeordnet.",
+			"notFound": "Team nicht gefunden",
+			"empty": "Noch keine Teams",
+			"counts": "{{members}} Mitglieder · {{projects}} Projekte"
 		}
 	}
 }

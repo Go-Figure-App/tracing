@@ -12,6 +12,8 @@ import {
   initiativeTable,
   projectMilestoneTable,
 } from "../../database/schema-parity";
+import { enabledFeatures } from "../foundation/features";
+import { listTeams } from "../teams/read";
 import { cycleSettings } from "../cycles/settings-read";
 import { readableProjects, type Actor } from "../planning/access";
 
@@ -109,6 +111,14 @@ export async function viewOptions(who: Actor, projectId?: string) {
       .limit(1001),
   ]);
   return {
+    ...(enabledFeatures().includes("teams")
+      ? {
+          teams: (await listTeams(who, false)).map(({ id, name }) => ({
+            id,
+            name,
+          })),
+        }
+      : {}),
     states: states.slice(0, 1000),
     initiatives: initiatives.slice(0, 1000),
     projects: projects.slice(0, 1000),

@@ -9,7 +9,8 @@ export function usePlanningEnabled(
     | "cycles"
     | "insights"
     | "views"
-    | "import",
+    | "import"
+    | "teams",
 ) {
   const query = useQuery({
     queryKey: ["parity", "features"],

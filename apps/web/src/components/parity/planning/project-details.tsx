@@ -1,3 +1,4 @@
+import { ProjectTeamPicker } from "../teams/project-team-picker";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,13 @@ export function ProjectDetails({
             </div>
           ))}
         </dl>
+        <div className="mt-4">
+          <ProjectTeamPicker
+            workspaceId={workspaceId}
+            projectId={projectId}
+            teamId={project.teamId}
+          />
+        </div>
         <div className="mt-4">
           <ProjectInitiatives workspaceId={workspaceId} projectId={projectId} />
         </div>

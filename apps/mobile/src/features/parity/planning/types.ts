@@ -43,6 +43,7 @@ export type Milestone = {
   progress: Progress;
 };
 export type ProjectSummary = {
+  teamId?: string | null;
   id: string;
   workspaceId: string;
   name: string;
@@ -63,7 +64,7 @@ export type ProjectPlan = ProjectSummary & { milestones: Milestone[] };
 export type PlanInput = Partial<
   Pick<
     ProjectPlan,
-    "status" | "leadId" | "startDate" | "targetDate" | "priority"
+    "status" | "teamId" | "leadId" | "startDate" | "targetDate" | "priority"
   >
 >;
 export type Initiative = {

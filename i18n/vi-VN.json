@@ -5337,6 +5337,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Nhóm",
+				"team": "Nhóm",
+				"noTeam": "Không có nhóm",
+				"issues": "Công việc",
+				"projects": "Dự án",
+				"archived": "Đã lưu trữ",
+				"notFound": "Không tìm thấy nhóm",
+				"empty": "Chưa có nhóm"
 			}
 		}
 	},
@@ -5752,7 +5762,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Giai đoạn chu kỳ",
 				"initiative": "Sáng kiến",
-				"state": "Trạng thái quy trình"
+				"state": "Trạng thái quy trình",
+				"team": "Nhóm"
 			},
 			"groups": {
 				"state": "State",
@@ -5789,6 +5800,38 @@
 		"navigation": {
 			"myIssues": "Vấn đề của tôi",
 			"newIssue": "Vấn đề mới"
+		},
+		"teams": {
+			"title": "Nhóm",
+			"team": "Nhóm",
+			"yourTeams": "Nhóm của bạn",
+			"all": "Tất cả nhóm",
+			"noTeam": "Không có nhóm",
+			"create": "Tạo nhóm",
+			"edit": "Chỉnh sửa nhóm",
+			"name": "Tên",
+			"key": "Mã",
+			"description": "Mô tả",
+			"icon": "Biểu tượng",
+			"color": "Màu",
+			"leadId": "Trưởng nhóm",
+			"organizeOnly": "Nhóm giúp tổ chức công việc. Quyền xem dự án không thay đổi.",
+			"members": "Thành viên",
+			"noMembers": "Chưa có thành viên",
+			"selectMember": "Chọn thành viên không gian làm việc",
+			"addMember": "Thêm thành viên",
+			"removeMember": "Xóa thành viên",
+			"issues": "Công việc",
+			"projects": "Dự án",
+			"settings": "Cài đặt",
+			"archived": "Đã lưu trữ",
+			"restore": "Khôi phục nhóm",
+			"archive": "Lưu trữ nhóm",
+			"delete": "Xóa nhóm",
+			"deleteWarning": "Xóa nhóm này? Mọi dự án và công việc sẽ được giữ lại và chuyển thành không có nhóm.",
+			"notFound": "Không tìm thấy nhóm",
+			"empty": "Chưa có nhóm",
+			"counts": "{{members}} thành viên · {{projects}} dự án"
 		}
 	}
 }

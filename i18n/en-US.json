@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Teams",
+				"team": "Team",
+				"noTeam": "No team",
+				"issues": "Issues",
+				"projects": "Projects",
+				"archived": "Archived",
+				"notFound": "Team not found",
+				"empty": "No teams yet"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"state": "Workflow state",
 				"initiative": "Initiative",
-				"cycle-period": "Cycle period"
+				"cycle-period": "Cycle period",
+				"team": "Team"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "My issues",
 			"newIssue": "New issue"
+		},
+		"teams": {
+			"title": "Teams",
+			"team": "Team",
+			"yourTeams": "Your teams",
+			"all": "All teams",
+			"noTeam": "No team",
+			"create": "Create team",
+			"edit": "Edit team",
+			"name": "Name",
+			"key": "Key",
+			"description": "Description",
+			"icon": "Icon",
+			"color": "Color",
+			"leadId": "Lead",
+			"organizeOnly": "Teams organize work. Project visibility is unchanged.",
+			"members": "Members",
+			"noMembers": "No members yet",
+			"selectMember": "Select a workspace member",
+			"addMember": "Add member",
+			"removeMember": "Remove member",
+			"issues": "Issues",
+			"projects": "Projects",
+			"settings": "Settings",
+			"archived": "Archived",
+			"restore": "Restore team",
+			"archive": "Archive team",
+			"delete": "Delete team",
+			"deleteWarning": "Delete this team? All projects and issues will be kept and assigned to No team.",
+			"notFound": "Team not found",
+			"empty": "No teams yet",
+			"counts": "{{members}} members · {{projects}} projects"
 		}
 	}
 }

@@ -28,6 +28,7 @@ import { localMidnight } from "../cycles/calendar";
 import { shiftDay } from "../insights/range";
 import { taskCategory } from "../planning/progress-query";
 import { filtersSchema, type TaskFilter } from "./schema";
+import { projectTeamId } from "../teams/project-filter";
 import { taskState } from "./task-state";
 
 // Upstream keeps the recorded creator in activity, not on the task row. Missing
@@ -122,6 +123,8 @@ export function taskFilterSql(
       return matches(sql`${taskTable.userId}`, filter.values, filter.operator);
     case "creator":
       return matches(taskCreator, filter.values, filter.operator);
+    case "team":
+      return matches(projectTeamId, filter.values, filter.operator);
     case "project":
       return matches(
         sql`${taskTable.projectId}`,

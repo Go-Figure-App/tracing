@@ -5337,6 +5337,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "团队",
+				"team": "团队",
+				"noTeam": "无团队",
+				"issues": "任务",
+				"projects": "项目",
+				"archived": "已归档",
+				"notFound": "找不到团队",
+				"empty": "暂无团队"
 			}
 		}
 	},
@@ -5752,7 +5762,8 @@
 				"completed": "Completed date",
 				"cycle-period": "周期阶段",
 				"initiative": "计划",
-				"state": "工作流状态"
+				"state": "工作流状态",
+				"team": "团队"
 			},
 			"groups": {
 				"state": "State",
@@ -5789,6 +5800,38 @@
 		"navigation": {
 			"myIssues": "我的事项",
 			"newIssue": "新建事项"
+		},
+		"teams": {
+			"title": "团队",
+			"team": "团队",
+			"yourTeams": "你的团队",
+			"all": "所有团队",
+			"noTeam": "无团队",
+			"create": "创建团队",
+			"edit": "编辑团队",
+			"name": "名称",
+			"key": "标识",
+			"description": "描述",
+			"icon": "图标",
+			"color": "颜色",
+			"leadId": "负责人",
+			"organizeOnly": "团队用于组织工作。项目的可见性保持不变。",
+			"members": "成员",
+			"noMembers": "暂无成员",
+			"selectMember": "选择工作区成员",
+			"addMember": "添加成员",
+			"removeMember": "移除成员",
+			"issues": "任务",
+			"projects": "项目",
+			"settings": "设置",
+			"archived": "已归档",
+			"restore": "恢复团队",
+			"archive": "归档团队",
+			"delete": "删除团队",
+			"deleteWarning": "删除此团队？所有项目和任务都会保留，并设为无团队。",
+			"notFound": "找不到团队",
+			"empty": "暂无团队",
+			"counts": "{{members}} 位成员 · {{projects}} 个项目"
 		}
 	}
 }

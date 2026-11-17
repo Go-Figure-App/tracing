@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "टीमें",
+				"team": "टीम",
+				"noTeam": "कोई टीम नहीं",
+				"issues": "कार्य",
+				"projects": "परियोजनाएँ",
+				"archived": "संग्रहीत",
+				"notFound": "टीम नहीं मिली",
+				"empty": "अभी कोई टीम नहीं"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "चक्र अवधि",
 				"initiative": "पहल",
-				"state": "कार्यप्रवाह की स्थिति"
+				"state": "कार्यप्रवाह की स्थिति",
+				"team": "टीम"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "मेरे मुद्दे",
 			"newIssue": "नया मुद्दा"
+		},
+		"teams": {
+			"title": "टीमें",
+			"team": "टीम",
+			"yourTeams": "आपकी टीमें",
+			"all": "सभी टीमें",
+			"noTeam": "कोई टीम नहीं",
+			"create": "टीम बनाएँ",
+			"edit": "टीम संपादित करें",
+			"name": "नाम",
+			"key": "कुंजी",
+			"description": "विवरण",
+			"icon": "आइकन",
+			"color": "रंग",
+			"leadId": "प्रमुख",
+			"organizeOnly": "टीमें काम व्यवस्थित करती हैं। परियोजनाओं की दृश्यता नहीं बदलती।",
+			"members": "सदस्य",
+			"noMembers": "अभी कोई सदस्य नहीं",
+			"selectMember": "कार्यस्थान का सदस्य चुनें",
+			"addMember": "सदस्य जोड़ें",
+			"removeMember": "सदस्य हटाएँ",
+			"issues": "कार्य",
+			"projects": "परियोजनाएँ",
+			"settings": "सेटिंग्स",
+			"archived": "संग्रहीत",
+			"restore": "टीम बहाल करें",
+			"archive": "टीम संग्रहीत करें",
+			"delete": "टीम हटाएँ",
+			"deleteWarning": "यह टीम हटाएँ? सभी परियोजनाएँ और कार्य बने रहेंगे और किसी टीम से जुड़े नहीं होंगे।",
+			"notFound": "टीम नहीं मिली",
+			"empty": "अभी कोई टीम नहीं",
+			"counts": "{{members}} सदस्य · {{projects}} परियोजनाएँ"
 		}
 	}
 }

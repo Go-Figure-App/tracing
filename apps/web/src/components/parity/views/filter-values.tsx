@@ -70,35 +70,40 @@ export function FilterValues({
               )
             : [
                 { value: null, name: t("parity:views.missing") },
-                ...(filter.field === "assignee" || filter.field === "creator"
-                  ? (options?.users ?? []).map((item) => ({
+                ...(filter.field === "team"
+                  ? (options?.teams ?? []).map((item) => ({
                       value: item.id,
                       name: item.name,
                     }))
-                  : filter.field === "initiative"
-                    ? (options?.initiatives ?? []).map((item) => ({
+                  : filter.field === "assignee" || filter.field === "creator"
+                    ? (options?.users ?? []).map((item) => ({
                         value: item.id,
                         name: item.name,
                       }))
-                    : filter.field === "project"
-                      ? (options?.projects ?? []).map((item) => ({
+                    : filter.field === "initiative"
+                      ? (options?.initiatives ?? []).map((item) => ({
                           value: item.id,
                           name: item.name,
                         }))
-                      : filter.field === "cycle"
-                        ? (options?.cycles ?? []).map((item) => ({
+                      : filter.field === "project"
+                        ? (options?.projects ?? []).map((item) => ({
                             value: item.id,
-                            name: item.name ?? String(item.number),
+                            name: item.name,
                           }))
-                        : filter.field === "milestone"
-                          ? (options?.milestones ?? []).map((item) => ({
+                        : filter.field === "cycle"
+                          ? (options?.cycles ?? []).map((item) => ({
                               value: item.id,
-                              name: `${item.projectName} · ${item.name}`,
+                              name: item.name ?? String(item.number),
                             }))
-                          : (options?.labels ?? []).map((item) => ({
-                              value: item.name,
-                              name: item.name,
-                            }))),
+                          : filter.field === "milestone"
+                            ? (options?.milestones ?? []).map((item) => ({
+                                value: item.id,
+                                name: `${item.projectName} · ${item.name}`,
+                              }))
+                            : (options?.labels ?? []).map((item) => ({
+                                value: item.name,
+                                name: item.name,
+                              }))),
               ];
   const selected = filter.values as (string | null)[];
   for (const value of selected)

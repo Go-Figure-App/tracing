@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Takımlar",
+				"team": "Takım",
+				"noTeam": "Takım yok",
+				"issues": "İşler",
+				"projects": "Projeler",
+				"archived": "Arşivlendi",
+				"notFound": "Takım bulunamadı",
+				"empty": "Henüz takım yok"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Döngü dönemi",
 				"initiative": "Girişim",
-				"state": "İş akışı durumu"
+				"state": "İş akışı durumu",
+				"team": "Takım"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "Sorunlarım",
 			"newIssue": "Yeni sorun"
+		},
+		"teams": {
+			"title": "Takımlar",
+			"team": "Takım",
+			"yourTeams": "Takımlarınız",
+			"all": "Tüm takımlar",
+			"noTeam": "Takım yok",
+			"create": "Takım oluştur",
+			"edit": "Takımı düzenle",
+			"name": "Ad",
+			"key": "Anahtar",
+			"description": "Açıklama",
+			"icon": "Simge",
+			"color": "Renk",
+			"leadId": "Lider",
+			"organizeOnly": "Takımlar işleri düzenler. Projelerin görünürlüğü değişmez.",
+			"members": "Üyeler",
+			"noMembers": "Henüz üye yok",
+			"selectMember": "Çalışma alanı üyesi seçin",
+			"addMember": "Üye ekle",
+			"removeMember": "Üyeyi kaldır",
+			"issues": "İşler",
+			"projects": "Projeler",
+			"settings": "Ayarlar",
+			"archived": "Arşivlendi",
+			"restore": "Takımı geri yükle",
+			"archive": "Takımı arşivle",
+			"delete": "Takımı sil",
+			"deleteWarning": "Bu takım silinsin mi? Tüm projeler ve işler korunur ve takımsız kalır.",
+			"notFound": "Takım bulunamadı",
+			"empty": "Henüz takım yok",
+			"counts": "{{members}} üye · {{projects}} proje"
 		}
 	}
 }

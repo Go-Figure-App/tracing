@@ -42,10 +42,12 @@ export function FilterBuilder({
   filters,
   onChange,
   options,
+  limit = 30,
 }: {
   filters: ViewFilters;
   onChange: (filters: ViewFilters) => void;
   options?: ViewOptions;
+  limit?: number;
 }) {
   const { t } = useTranslation();
   const [identity, setIdentity] = useState(() => ({
@@ -82,11 +84,15 @@ export function FilterBuilder({
                 )
               }
             >
-              {filterFields.map((field) => (
-                <option key={field} value={field}>
-                  {t(`parity:views.filters.${field}`)}
-                </option>
-              ))}
+              {filterFields
+                .filter(
+                  (field) => field !== "team" || options?.teams !== undefined,
+                )
+                .map((field) => (
+                  <option key={field} value={field}>
+                    {t(`parity:views.filters.${field}`)}
+                  </option>
+                ))}
             </select>
             <select
               aria-label={t("parity:views.operator")}
@@ -136,7 +142,7 @@ export function FilterBuilder({
         <Button
           variant="ghost"
           size="sm"
-          disabled={filters.length >= 30}
+          disabled={filters.length >= limit}
           onClick={() =>
             change(
               [...filters, initialFilter("category", options)],

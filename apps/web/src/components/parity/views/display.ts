@@ -14,6 +14,7 @@ export const filterFields = [
   "category",
   "state",
   "initiative",
+  "team",
   "cycle-period",
   "priority",
   "assignee",
@@ -29,6 +30,7 @@ export const filterFields = [
 ] as const;
 export function validFilters(filters: TaskFilter[]) {
   return (
+    filters.length <= 30 &&
     encodeURIComponent(JSON.stringify(filters)).length <= 6_000 &&
     filters.every((filter) => {
       if ("values" in filter) return filter.values.length > 0;

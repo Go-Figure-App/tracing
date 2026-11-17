@@ -16,10 +16,10 @@ import type {
 const root = "api/parity";
 const part = encodeURIComponent;
 export const planningApi = {
-  projects: (workspaceId: string, page = 1) =>
+  projects: (workspaceId: string, page = 1, team?: string) =>
     request<Page<ProjectSummary>>(
       `${root}/project-plan/workspace/${part(workspaceId)}`,
-      { query: { page, pageSize: 100 } },
+      { query: { page, pageSize: 100, ...(team ? { team } : {}) } },
     ),
   project: (id: string) =>
     request<ProjectPlan>(`${root}/project-plan/${part(id)}`),

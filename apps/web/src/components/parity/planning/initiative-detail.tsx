@@ -2,6 +2,7 @@ import { FavoriteButton } from "../views/favorite-button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Plus, Target, X } from "lucide-react";
+import { TeamFilter } from "../teams/team-filter";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkspaceLayout from "@/components/common/workspace-layout";
@@ -45,12 +46,13 @@ export function InitiativeDetail({
   const navigate = useNavigate();
   const enabled = usePlanningEnabled("initiatives");
   const { canUpdateProjects, canManageSettings } = useWorkspacePermission();
+  const [team, setTeam] = useState("");
   const [editing, setEditing] = useState(false);
   const [linking, setLinking] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const query = useQuery({
-    queryKey: ["parity", "initiative", initiativeId, workspaceId],
-    queryFn: () => getInitiative(initiativeId),
+    queryKey: ["parity", "initiative", initiativeId, workspaceId, team],
+    queryFn: () => getInitiative(initiativeId, team || undefined),
     enabled,
   });
   const initiative =
@@ -236,6 +238,11 @@ export function InitiativeDetail({
                           {t("parity:planning.noProjects")}
                         </p>
                       )}
+                      <TeamFilter
+                        workspaceId={initiative.workspaceId}
+                        value={team}
+                        onChange={setTeam}
+                      />
                       <ProjectsTable
                         projects={initiative.projects}
                         groupBy="status"

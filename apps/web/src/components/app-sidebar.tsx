@@ -1,3 +1,4 @@
+import { TeamsNavigation } from "@/components/parity/teams/navigation";
 import { useLocation } from "@tanstack/react-router";
 import type * as React from "react";
 import { useEffect } from "react";
@@ -48,7 +49,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         }
       >
         {planning ? (
-          <PlanningNavigation />
+          <>
+            <PlanningNavigation />
+            <TeamsNavigation />
+          </>
         ) : (
           <>
             <NavMain />

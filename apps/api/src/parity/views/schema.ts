@@ -41,6 +41,7 @@ export const taskFilter = z
         "cycle",
         "milestone",
         "initiative",
+        "team",
       ]),
       operator: equality,
       values: z.array(id.nullable()).min(1).max(50),
@@ -117,6 +118,7 @@ export const workspaceTaskQuery = pageQuery
       .default("priority"),
     direction: z.enum(["asc", "desc"]).default("asc"),
     projectId: id.optional(),
+    team: id.optional().describe("Team ID, or none for unassigned projects"),
     includeArchivedProjects: z.enum(["true", "false"]).optional(),
   })
   .strict();

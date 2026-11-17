@@ -1,9 +1,10 @@
 import { client } from "@tracing/libs";
 import { HttpError } from "@/lib/http-error";
 
-export async function getRoadmap(workspaceId: string) {
+export async function getRoadmap(workspaceId: string, team?: string) {
   const response = await client.parity.roadmap[":workspaceId"].$get({
     param: { workspaceId },
+    query: { team },
   });
   if (!response.ok) throw await HttpError.fromResponse(response);
   return response.json();

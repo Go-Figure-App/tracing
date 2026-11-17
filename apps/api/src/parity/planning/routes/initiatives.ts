@@ -86,7 +86,7 @@ const get = createRoute({
   tags: ["Initiatives"],
   summary: "Get an initiative and its readable projects",
   middleware: [...itemRead],
-  request: { params: itemParams },
+  request: { params: itemParams, query: z.object({ team: id.optional() }) },
   responses: { 200: jsonResponse("Initiative", detail), ...errors },
 });
 const update = createRoute({
@@ -171,7 +171,14 @@ export default planningRouter()
     c.json(await createInitiative(actor(c), c.req.valid("json")), 200),
   )
   .openapi(get, async (c) =>
-    c.json(await getInitiative(c.req.valid("param").id, actor(c)), 200),
+    c.json(
+      await getInitiative(
+        c.req.valid("param").id,
+        actor(c),
+        c.req.valid("query").team,
+      ),
+      200,
+    ),
   )
   .openapi(update, async (c) => {
     const input = c.req.valid("json");

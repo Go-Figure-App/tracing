@@ -22,10 +22,14 @@ export async function getProjectPlan(projectId: string) {
 export type ProjectPlan = Awaited<ReturnType<typeof getProjectPlan>>;
 export type Milestone = ProjectPlan["milestones"][number];
 export type PlanningProgress = ProjectPlan["progress"];
-export async function getProjectPlans(workspaceId: string, page = 1) {
+export async function getProjectPlans(
+  workspaceId: string,
+  page = 1,
+  team?: string,
+) {
   const response = await plans.workspace[":workspaceId"].$get({
     param: { workspaceId },
-    query: { page: String(page), pageSize: "100" },
+    query: { page: String(page), pageSize: "100", ...(team ? { team } : {}) },
   });
   if (!response.ok) throw await HttpError.fromResponse(response);
   return response.json();

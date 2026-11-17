@@ -39,6 +39,7 @@ export const viewFilters = z
             "project",
             "cycle",
             "milestone",
+            "team",
           ]),
           operator: equality,
           values: z.array(id.nullable()).min(1).max(50),
