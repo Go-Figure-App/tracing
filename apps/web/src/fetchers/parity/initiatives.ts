@@ -25,8 +25,11 @@ export async function getInitiatives(
   if (!response.ok) throw await HttpError.fromResponse(response);
   return response.json();
 }
-export async function getInitiative(id: string) {
-  const response = await initiatives.item[":id"].$get({ param: { id } });
+export async function getInitiative(id: string, team?: string) {
+  const response = await initiatives.item[":id"].$get({
+    param: { id },
+    query: { team },
+  });
   if (!response.ok) throw await HttpError.fromResponse(response);
   return response.json();
 }

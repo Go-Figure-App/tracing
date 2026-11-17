@@ -5522,6 +5522,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Équipes",
+				"team": "Équipe",
+				"noTeam": "Sans équipe",
+				"issues": "Tâches",
+				"projects": "Projets",
+				"archived": "Archivée",
+				"notFound": "Équipe introuvable",
+				"empty": "Aucune équipe pour le moment"
 			}
 		}
 	},
@@ -5939,7 +5949,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Période du cycle",
 				"initiative": "Initiative",
-				"state": "État du workflow"
+				"state": "État du workflow",
+				"team": "Équipe"
 			},
 			"groups": {
 				"state": "State",
@@ -5976,6 +5987,38 @@
 		"navigation": {
 			"myIssues": "Mes tickets",
 			"newIssue": "Nouveau ticket"
+		},
+		"teams": {
+			"title": "Équipes",
+			"team": "Équipe",
+			"yourTeams": "Vos équipes",
+			"all": "Toutes les équipes",
+			"noTeam": "Sans équipe",
+			"create": "Créer une équipe",
+			"edit": "Modifier l’équipe",
+			"name": "Nom",
+			"key": "Clé",
+			"description": "Description",
+			"icon": "Icône",
+			"color": "Couleur",
+			"leadId": "Responsable",
+			"organizeOnly": "Les équipes organisent le travail. La visibilité des projets reste inchangée.",
+			"members": "Membres",
+			"noMembers": "Aucun membre pour le moment",
+			"selectMember": "Sélectionner un membre de l’espace de travail",
+			"addMember": "Ajouter un membre",
+			"removeMember": "Retirer le membre",
+			"issues": "Tâches",
+			"projects": "Projets",
+			"settings": "Paramètres",
+			"archived": "Archivée",
+			"restore": "Restaurer l’équipe",
+			"archive": "Archiver l’équipe",
+			"delete": "Supprimer l’équipe",
+			"deleteWarning": "Supprimer cette équipe ? Tous les projets et tâches seront conservés et n’auront plus d’équipe.",
+			"notFound": "Équipe introuvable",
+			"empty": "Aucune équipe pour le moment",
+			"counts": "{{members}} membres · {{projects}} projets"
 		}
 	}
 }

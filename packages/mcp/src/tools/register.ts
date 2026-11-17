@@ -4,6 +4,7 @@ import { encodeCustomFieldValue } from "../tracing/custom-field-value.js";
 import { buildFullTaskUpdateBody } from "../tracing/task-helpers.js";
 import { errorResult, textResult } from "../utils/mcp-result.js";
 import { getCurrentUser } from "./get-current-user.js";
+import { registerTeamTools } from "./parity/teams.js";
 import { registerTriageTools } from "./parity/triage.js";
 import { registerPlanningTools } from "./parity/planning.js";
 import { registerCycleTools } from "./parity/cycles.js";
@@ -61,6 +62,7 @@ export function registerTools(
   registerPlanningTools(server, client);
   registerCycleTools(server, client);
   registerViewTools(server, client);
+  registerTeamTools(server, client);
   const registerTool = <S extends z.ZodObject>(
     name: string,
     config: { description: string; inputSchema: S },
@@ -99,6 +101,12 @@ export function registerTools(
       description: "List projects in a workspace.",
       inputSchema: z.object({
         workspaceId: nonEmptyString.describe("Workspace ID"),
+        page: z.number().int().min(1).max(100_000).optional(),
+        pageSize: z.number().int().min(1).max(100).optional(),
+        team: nonEmptyString
+          .max(128)
+          .optional()
+          .describe("Team ID, or none for No team; requires teams"),
         includeArchived: z
           .boolean()
           .optional()
@@ -106,10 +114,21 @@ export function registerTools(
       }),
     },
     async (args) => {
-      const { workspaceId, includeArchived } = args;
+      const { workspaceId, includeArchived, team, page, pageSize } = args;
       const qs = new URLSearchParams({ workspaceId });
       if (includeArchived === true) {
         qs.set("includeArchived", "true");
+      }
+      if (team !== undefined) {
+        if (includeArchived)
+          return errorResult(
+            "Archived team project listing is unavailable; omit includeArchived",
+          );
+        return run(() =>
+          client.json(
+            `/api/parity/project-plan/workspace/${encodeURIComponent(workspaceId)}?${new URLSearchParams({ team, ...(page ? { page: String(page) } : {}), ...(pageSize ? { pageSize: String(pageSize) } : {}) })}`,
+          ),
+        );
       }
       return run(() =>
         client.json(`/api/project?${qs.toString()}`, { method: "GET" }),

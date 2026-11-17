@@ -38,6 +38,11 @@ import {
   taskFilterSql,
   taskUpdatedAt,
 } from "./task-filters";
+import {
+  projectTeamCondition,
+  validateTeamFilter,
+} from "../teams/project-filter";
+import { validateViewFilterAccess } from "./filter-access";
 import type { WorkspaceTaskQuery } from "./schema";
 
 export async function listWorkspaceTasks(
@@ -45,6 +50,12 @@ export async function listWorkspaceTasks(
   query: WorkspaceTaskQuery,
 ) {
   const filters = parseTaskFilters(query.filters);
+  await validateTeamFilter(who, query.team);
+  await validateViewFilterAccess(
+    db,
+    who,
+    filters.filter((filter) => filter.field === "team"),
+  );
   const settings = await cycleSettings(who.workspaceId);
   const order =
     query.orderBy === "priority"
@@ -126,6 +137,7 @@ export async function listWorkspaceTasks(
             )
           : readableProjects(who),
         acceptedTaskCondition(taskTable.id),
+        projectTeamCondition(query.team),
         query.projectId ? eq(taskTable.projectId, query.projectId) : undefined,
         ...filters.map((filter) => taskFilterSql(filter, settings.timeZone)),
         needle

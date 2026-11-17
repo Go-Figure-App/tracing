@@ -1,5 +1,7 @@
+import { ProjectTeamPicker } from "../teams/project-team-picker";
 import { Fragment, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import { usePlanningEnabled } from "./queries";
 import { ProjectProperty } from "./project-property";
 import { useTranslation } from "react-i18next";
 import icons from "@/constants/project-icons";
@@ -32,6 +34,7 @@ export function ProjectsTable({
 }) {
   const { t, i18n } = useTranslation();
   const labels = usePlanningLabels();
+  const teamsEnabled = usePlanningEnabled("teams");
   const visible = projectColumns.filter((column) => columns.includes(column));
   const groupKeys =
     groupBy === "status"
@@ -58,7 +61,18 @@ export function ProjectsTable({
     <div className="overflow-x-auto">
       <table
         className="w-full table-fixed text-left text-[13px]"
-        style={{ minWidth: 260 + visible.length * 92 }}
+        style={{
+          minWidth: teamsEnabled
+            ? 260 +
+              visible.reduce(
+                (width, column) =>
+                  width +
+                  (["priority", "lead", "issues"].includes(column) ? 80 : 144),
+                0,
+              ) +
+              (actions ? 40 : 0)
+            : 260 + visible.length * 92,
+        }}
       >
         <thead className="text-xs text-muted-foreground">
           <tr>
@@ -165,6 +179,11 @@ export function ProjectsTable({
                           {project.name}
                         </span>
                       </Link>
+                      <ProjectTeamPicker
+                        workspaceId={project.workspaceId}
+                        projectId={project.id}
+                        teamId={project.teamId}
+                      />
                     </td>
                     {visible.map((column) => (
                       <td key={column} className="px-3 py-2 text-xs">

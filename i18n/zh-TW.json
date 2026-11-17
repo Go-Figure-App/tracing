@@ -5337,6 +5337,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "團隊",
+				"team": "團隊",
+				"noTeam": "無團隊",
+				"issues": "任務",
+				"projects": "專案",
+				"archived": "已封存",
+				"notFound": "找不到團隊",
+				"empty": "尚無團隊"
 			}
 		}
 	},
@@ -5752,7 +5762,8 @@
 				"completed": "Completed date",
 				"cycle-period": "週期階段",
 				"initiative": "計畫",
-				"state": "工作流程狀態"
+				"state": "工作流程狀態",
+				"team": "團隊"
 			},
 			"groups": {
 				"state": "State",
@@ -5789,6 +5800,38 @@
 		"navigation": {
 			"myIssues": "我的事項",
 			"newIssue": "新增事項"
+		},
+		"teams": {
+			"title": "團隊",
+			"team": "團隊",
+			"yourTeams": "你的團隊",
+			"all": "所有團隊",
+			"noTeam": "無團隊",
+			"create": "建立團隊",
+			"edit": "編輯團隊",
+			"name": "名稱",
+			"key": "識別碼",
+			"description": "描述",
+			"icon": "圖示",
+			"color": "顏色",
+			"leadId": "負責人",
+			"organizeOnly": "團隊用於組織工作。專案的可見性維持不變。",
+			"members": "成員",
+			"noMembers": "尚無成員",
+			"selectMember": "選擇工作區成員",
+			"addMember": "新增成員",
+			"removeMember": "移除成員",
+			"issues": "任務",
+			"projects": "專案",
+			"settings": "設定",
+			"archived": "已封存",
+			"restore": "還原團隊",
+			"archive": "封存團隊",
+			"delete": "刪除團隊",
+			"deleteWarning": "刪除此團隊？所有專案和任務都會保留，並設為無團隊。",
+			"notFound": "找不到團隊",
+			"empty": "尚無團隊",
+			"counts": "{{members}} 位成員 · {{projects}} 個專案"
 		}
 	}
 }

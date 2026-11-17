@@ -5615,6 +5615,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Zespoły",
+				"team": "Zespół",
+				"noTeam": "Bez zespołu",
+				"issues": "Zadania",
+				"projects": "Projekty",
+				"archived": "Zarchiwizowany",
+				"notFound": "Nie znaleziono zespołu",
+				"empty": "Brak zespołów"
 			}
 		}
 	},
@@ -6034,7 +6044,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Okres cyklu",
 				"initiative": "Inicjatywa",
-				"state": "Status przepływu pracy"
+				"state": "Status przepływu pracy",
+				"team": "Zespół"
 			},
 			"groups": {
 				"state": "State",
@@ -6071,6 +6082,38 @@
 		"navigation": {
 			"myIssues": "Moje zadania",
 			"newIssue": "Nowe zadanie"
+		},
+		"teams": {
+			"title": "Zespoły",
+			"team": "Zespół",
+			"yourTeams": "Twoje zespoły",
+			"all": "Wszystkie zespoły",
+			"noTeam": "Bez zespołu",
+			"create": "Utwórz zespół",
+			"edit": "Edytuj zespół",
+			"name": "Nazwa",
+			"key": "Klucz",
+			"description": "Opis",
+			"icon": "Ikona",
+			"color": "Kolor",
+			"leadId": "Lider",
+			"organizeOnly": "Zespoły organizują pracę. Widoczność projektów pozostaje bez zmian.",
+			"members": "Członkowie",
+			"noMembers": "Brak członków",
+			"selectMember": "Wybierz członka obszaru roboczego",
+			"addMember": "Dodaj członka",
+			"removeMember": "Usuń członka",
+			"issues": "Zadania",
+			"projects": "Projekty",
+			"settings": "Ustawienia",
+			"archived": "Zarchiwizowany",
+			"restore": "Przywróć zespół",
+			"archive": "Archiwizuj zespół",
+			"delete": "Usuń zespół",
+			"deleteWarning": "Usunąć ten zespół? Wszystkie projekty i zadania zostaną zachowane i pozostaną bez zespołu.",
+			"notFound": "Nie znaleziono zespołu",
+			"empty": "Brak zespołów",
+			"counts": "{{members}} członków · {{projects}} projektów"
 		}
 	}
 }

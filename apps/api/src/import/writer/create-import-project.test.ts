@@ -13,13 +13,18 @@ vi.mock("../../database", () => ({
   default: {
     select: () => ({ from: () => ({ where: async () => [] }) }),
     transaction: async (work: (tx: unknown) => Promise<unknown>) => {
-      const tx = { id: mocks.transactions.length + 1 };
+      const tx = {
+        id: mocks.transactions.length + 1,
+        execute: async () => {
+          mocks.steps.push("lock");
+        },
+      };
       try {
         const result = await work(tx);
-        mocks.transactions.push({ ...tx, outcome: "committed" });
+        mocks.transactions.push({ id: tx.id, outcome: "committed" });
         return result;
       } catch (error) {
-        mocks.transactions.push({ ...tx, outcome: "rolled back" });
+        mocks.transactions.push({ id: tx.id, outcome: "rolled back" });
         throw error;
       }
     },
@@ -65,7 +70,7 @@ describe("createImportProject", () => {
 
     await expect(createImportProject(input, fill)).resolves.toBe("filled");
 
-    expect(mocks.steps).toEqual(["insert WEB", "fill", "place"]);
+    expect(mocks.steps).toEqual(["lock", "insert WEB", "fill", "place"]);
     const [tx] = mocks.insertUnplacedProject.mock.calls[0] ?? [];
     expect(mocks.insertUnplacedProject).toHaveBeenCalledWith(tx, {
       workspaceId: "workspace-1",

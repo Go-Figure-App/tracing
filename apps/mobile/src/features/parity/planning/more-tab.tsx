@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import {
+  Users,
   Activity,
   Folder,
   LayoutList,
@@ -31,7 +32,16 @@ export function MoreTab({
   const cycles = usePlanningEnabled("cycles");
   const insights = usePlanningEnabled("insights");
   const views = usePlanningEnabled("views");
+  const teams = usePlanningEnabled("teams");
   const entries = [
+    {
+      id: "teams",
+      enabled: teams,
+      label: t("mobile:parity.teams.title"),
+      Icon: Users,
+      onPress: () =>
+        router.push({ pathname: "/teams", params: { workspaceId } }),
+    },
     {
       id: "projects",
       enabled: projects,

@@ -1,3 +1,4 @@
+import { ProjectTeamPicker } from "../teams/project-team-picker";
 import { useIsFetching, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Calendar, MoreHorizontal, User } from "lucide-react-native";
@@ -181,6 +182,12 @@ export function ProjectOverview({ projectId }: { projectId: string }) {
                           onPress={edit}
                         />
                       </View>
+                      <ProjectTeamPicker
+                        workspaceId={project.workspaceId}
+                        projectId={projectId}
+                        teamId={project.teamId}
+                        canEdit={Boolean(edit)}
+                      />
                       <ProjectInitiatives
                         workspaceId={project.workspaceId}
                         projectId={projectId}

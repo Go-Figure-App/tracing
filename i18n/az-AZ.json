@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Komandalar",
+				"team": "Komanda",
+				"noTeam": "Komanda yoxdur",
+				"issues": "Tapşırıqlar",
+				"projects": "Layihələr",
+				"archived": "Arxivlənib",
+				"notFound": "Komanda tapılmadı",
+				"empty": "Hələ komanda yoxdur"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Dövr aralığı",
 				"initiative": "Təşəbbüs",
-				"state": "İş axını statusu"
+				"state": "İş axını statusu",
+				"team": "Komanda"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "Mənim tapşırıqlarım",
 			"newIssue": "Yeni tapşırıq"
+		},
+		"teams": {
+			"title": "Komandalar",
+			"team": "Komanda",
+			"yourTeams": "Komandalarınız",
+			"all": "Bütün komandalar",
+			"noTeam": "Komanda yoxdur",
+			"create": "Komanda yarat",
+			"edit": "Komandanı redaktə et",
+			"name": "Ad",
+			"key": "Açar",
+			"description": "Təsvir",
+			"icon": "İkon",
+			"color": "Rəng",
+			"leadId": "Rəhbər",
+			"organizeOnly": "Komandalar işi təşkil edir. Layihələrin görünməsi dəyişmir.",
+			"members": "Üzvlər",
+			"noMembers": "Hələ üzv yoxdur",
+			"selectMember": "İş sahəsinin üzvünü seçin",
+			"addMember": "Üzv əlavə et",
+			"removeMember": "Üzvü çıxar",
+			"issues": "Tapşırıqlar",
+			"projects": "Layihələr",
+			"settings": "Parametrlər",
+			"archived": "Arxivlənib",
+			"restore": "Komandanı bərpa et",
+			"archive": "Komandanı arxivlə",
+			"delete": "Komandanı sil",
+			"deleteWarning": "Bu komanda silinsin? Bütün layihələr və tapşırıqlar saxlanacaq və komandasız qalacaq.",
+			"notFound": "Komanda tapılmadı",
+			"empty": "Hələ komanda yoxdur",
+			"counts": "{{members}} üzv · {{projects}} layihə"
 		}
 	}
 }

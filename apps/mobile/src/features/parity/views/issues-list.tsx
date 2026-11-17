@@ -17,11 +17,13 @@ export function IssuesList({
   view,
   onRefresh,
   refreshing = false,
+  teamId,
 }: {
   workspaceId: string;
   view?: SavedView;
   onRefresh?: () => void;
   refreshing?: boolean;
+  teamId?: string;
 }) {
   const { t } = useTranslation(["mobile"]);
   const query = useInfiniteQuery({
@@ -30,11 +32,13 @@ export function IssuesList({
       "workspace-issues",
       workspaceId,
       view?.filters,
+      teamId,
       view?.projectId,
       view?.display.orderBy,
       view?.display.direction,
     ],
-    queryFn: ({ pageParam }) => viewsApi.tasks(workspaceId, pageParam, view),
+    queryFn: ({ pageParam }) =>
+      viewsApi.tasks(workspaceId, pageParam, view, teamId),
     initialPageParam: 1,
     getNextPageParam: (page) => (page.hasMore ? page.page + 1 : undefined),
     enabled: Boolean(workspaceId),

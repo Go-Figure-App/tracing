@@ -25,6 +25,12 @@ export const pageQuery = z.object({
   pageSize: pagingNumber(1, 100, 50),
 });
 export const planBody = z.object({
+  teamId: id
+    .nullable()
+    .optional()
+    .describe(
+      "Optional organizing team in this workspace; null clears. Requires the teams feature.",
+    ),
   status: projectStatus.optional(),
   leadId: id.nullable().optional(),
   startDate: z.iso.date().nullable().optional(),
@@ -91,6 +97,7 @@ export const milestoneSchema = z.object({
   progress: progressSchema,
 });
 export const projectSummarySchema = z.object({
+  teamId: id.nullable().optional(),
   id,
   workspaceId: id,
   name: z.string(),

@@ -4,11 +4,8 @@ Phase 0 implements the foundation from the technical design attached to [GOF-272
 
 ## Teams — design spike, November 16, 2026
 
-**Status: Phase A only; maintainer design approval pending.** This section
-proposes Teams v1 and the screenshot-led native navigation follow-up. It does
-not enable Teams, apply a new migration, or change application behavior. The
-existing "no independent team model" comparison remains accurate until Phase B
-lands. Phase C requires its own approval before implementation. No deployment,
+**Status: Phase A design and PR split approved; Phase B complete and ready for PR review.** This section records the approved Teams v1 model and the screenshot-led native
+navigation follow-up (merged in #24). Teams core remains behind its feature flag. Phase C requires its own approval before implementation. No deployment,
 production-data inspection, Railway change or distribution upload is included.
 
 ### Identity and membership
@@ -1044,10 +1041,148 @@ A second signed-in Linear reference pass covered the desktop sidebar, project co
 
 Projects use compact rows with truthful no-update health, issue counts, status/progress indicators, sortable headings, a compact status filter and List/Board display modes. Cards and rows expose single-field status/priority/lead/date edits; member queries are lazy, null clearing is explicit, writes use existing API permissions and cache invalidation. Project Overview, Updates and Issues share navigation and a collapsible properties/milestones/progress rail. On narrow screens the rail replaces the main pane while open. Home project cards open Overview when planning is enabled; existing issue layouts and backlog remain reachable. The disabled-planning sidebar and project navigation retain their original behavior.
 
-Deliberate differences: Tracing has no independent team model, Reviews, Agent, Loops, project resources/customers, or full project activity feed. The existing status-update feed is labeled Updates. Board grouping follows project status; drag ordering and a project Timeline control are not implied. Roadmap remains the existing timeline surface. No domain model, permissions, schema, settings design, mobile code or distribution build changes are included.
+Deliberate differences (updated by Teams core): organizing teams are available behind `teams`; private teams and team-scoped cycles remain future phases. Tracing has no Reviews, Agent, Loops, project resources/customers, or full project activity feed. The existing status-update feed is labeled Updates. Board grouping follows project status; drag ordering and a project Timeline control are not implied. Roadmap remains the existing timeline surface. No domain model, permissions, schema, settings design, mobile code or distribution build changes are included.
 
 Shared edit register: `components/app-sidebar.tsx` and `workspace-switcher.tsx` mount the optional planning sidebar/composer; `components/common/project-layout.tsx` mounts shared tabs/details, with its access-state tests updated; `components/home/home-projects.tsx` selects the planning landing page. The new Updates route and generated `routeTree.gen.ts` register that page. Nine copy keys are synchronized in all 21 locale catalogs, reusing existing translated date/issue labels. All other components and tests remain under `components/parity`.
 
 Validation: all 2,064 web tests, repository typechecks (22 tasks), lint/format, locale synchronization, OpenAPI consistency and production web compilation passed. Behavior tests cover permission-gated edits, one-field patches, explicit clearing, lazy member loading, visible failures, accessible section collapse, disabled planning, current project tabs and details visibility. Browser checks on disposable local data covered status change/reversal, lead unassign/reassign, date clear/restore, filter/search, priority order, List/Board, favorites reversal, sidebar composer/dismissal, tab navigation and mobile cycle navigation. Desktop widths 1280 and 1440 and a 430×932 narrow viewport were inspected; light and dark appearances are captured in `../tracing-navigation-evidence/`. Linear and production data were not changed.
 
 Review follow-up: pending property saves stay locked through attempted dismissal, workspace changes restore the correct details preference, compact leads display initials, and board issue counts and completion progress can be shown independently. Property inputs have explicit accessible labels. Two additional regression tests and the existing focused layout/property tests pass (12 total); typechecks, lint, all 21 locales and the web build were rechecked. The CI browser flows now exercise the inline editors, project tabs, board regrouping/reversal and collection-based project navigation.
+
+## Teams core — Phase B implementation, November 17, 2026
+
+The maintainer approved the Phase A model and PR split, including the extension's
+workspace foreign key. Delivery is sequential: #22 design, #23 Expo owner, and
+#24 native glass navigation were each approved on their final commit, passed all
+nine checks, and merged before this core work resumed. This is the next single
+PR. Phase C's proposal above remains awaiting separate implementation approval.
+
+Owned Teams modules reuse Better Auth identity/membership and add migration
+`0005_teams.sql`, `team_ext`, and nullable `project_ext.team_id`. Keys are unique
+per workspace, including archived teams. Workspace locks serialize provisioning,
+key/limit checks, membership, deletion and assignment. Default and legacy teams
+receive extensions idempotently. Existing projects remain unassigned. Deletion
+clears session/invitation references and project ownership through `SET NULL`;
+it never deletes a project or task. Team endpoints require actual workspace
+membership even for an instance administrator. Existing team permission statements
+and editable roles remain authoritative. Leads can change membership, with an
+additional `team:update` scope requirement for API keys.
+
+Raw auth team mutations and indirect invitation enrollment are blocked only with
+Teams enabled. Old team-bearing invitations must be reissued without a team.
+Workspace member removal reconciles memberships, leads and cached counts. Project
+moves ignore stale assignments immediately, reconcile them through the existing
+project event and refetch authorized counts in both affected workspaces. Events carry only type/workspace hints. Web/mobile refetch their
+existing parity query namespace, including derived issue/project/view collections;
+Redis stays optional.
+
+A single source Linear team is reused or created without merging members. The
+imported identity uses a stable workspace/source-team ID, so later runs and key
+fallbacks reuse it. Ambiguous multi-team ownership, archived matches or the limit
+retain No team with a warning. Unavailable keys receive a deterministic free key.
+Team issue pages retain the fixed team clause when saving a view copy. MCP exposes
+ten Teams tools in the shared HTTP/stdio registry; filtered project listings are
+paginated active planning collections and keep the unfiltered legacy contract.
+
+### Shared-file register
+
+- `apps/api/src/database/schema-parity.ts`, `apps/api/drizzle-parity/0005_teams.sql`
+  and its journal/snapshot: additive owned data only; inline named foreign keys
+  match the generated snapshot. Upstream schema/migrations are untouched.
+- `apps/api/src/import/writer/create-import-project.ts`: acquires the existing
+  workspace advisory lock before inserting a project, avoiding foreign-key lock
+  upgrade deadlocks during concurrent planning imports.
+- `apps/api/src/project/controllers/move-project.ts`: invokes the owned team-clear
+  helper in the move transaction and publishes refetch hints to both workspaces
+  after commit, so rapid round trips cannot retain an old assignment.
+- `apps/api/src/auth.ts`: mounts the owned before guard and workspace lifecycle
+  hooks. `apps/api/src/index.ts`: initializes provisioning after migrations.
+- `apps/api/src/parity/index.ts`, `foundation/features.ts` and
+  `foundation/workspace-events.ts`: route, feature dependencies and hint types.
+- `apps/api/src/parity/planning/{schema,project-read,project-write,initiative-read}.ts`
+  and `routes/{projects,initiatives}.ts`: optional assignment and authorized filters.
+  `parity/roadmap/{index,read}.ts`: team timeline filter.
+- `apps/api/src/parity/views/{schema,task-filters,task-read,filter-access,options,task-routes}.ts`:
+  derived team filters, validated references, optional choices and feature-off
+  rejection. Saved filters referencing disabled teams are hidden intact.
+- `apps/api/src/parity/import/write-project.ts`: owned import team assignment and
+  post-commit refetch hint.
+- `apps/web/src/components/app-sidebar.tsx`: mounts owned team navigation.
+  `components/settings/nav/use-settings-nav.ts`: feature-gated Settings → Teams.
+  New thin workspace/settings routes and generated `routeTree.gen.ts` mount pages.
+- `apps/web/src/components/parity/planning/{queries,projects-page,project-details,projects-table,initiative-detail}.tsx`
+  (queries is `.ts`): Teams flag, collection filters and owned project picker.
+  The table minimum width now accounts for its actual fixed column widths so
+  narrow layouts scroll without compressing the name and picker.
+- `apps/web/src/components/parity/views/{display,filter-builder,filter-values,issues-browser}`:
+  gated team options and fixed team issue browsing/saved copies.
+  `components/parity/roadmap/roadmap-page.tsx`: timeline Team filter.
+  `components/parity/foundation/workspace-events.ts`: hint invalidation.
+- `apps/web/src/fetchers/parity/{projects,initiatives,roadmap}.ts`: typed optional
+  filters; owned `teams.ts` uses the existing typed Hono client.
+- `apps/mobile/src/features/parity/planning/{queries,types,api,more-tab,project-overview}`:
+  Teams flag/types/entry and owned overview picker. `views/{api,issues-list}`:
+  fixed team issues. `foundation/workspace-events.ts`: refetch hints. New thin
+  collection/detail routes mount owned Teams screens without native dependencies.
+- `packages/mcp/src/tools/register.ts` and `tools/parity/{views,view-filters}.ts`:
+  shared Teams registration and bounded nullable filters. New `teams.ts` owns tools.
+- `i18n/en-US.json` and all twenty translated catalogs:
+  Teams copy and synchronized mobile/filter keys.
+- `apps/docs/openapi.json`, `core/integrations/mcp.mdx` and
+  `core/migrations/from-linear.mdx`: generated contract and public behavior.
+- `tests/e2e/compose.parity.yml`: Teams enabled only in the disposable parity stack.
+  `tests/api-integration/parity-migrations.test.ts`: six-entry ledger and new owned
+  table assertion. New Teams integration/browser tests and adjacent unit tests
+  cover privacy, permissions, key allocation, provider guards and reverse actions.
+
+### Verification
+
+| Check | Result |
+| --- | --- |
+| Root lint/format and complete types/build graph | Clean; 22/22 tasks passed on final source. |
+| All workspace unit suites | Passed with `pnpm -r --workspace-concurrency=1 test`, including API 1,687, web 2,067, mobile 159 and MCP 107. |
+| Full disposable PostgreSQL run | 2,361 passed, three skipped; the old five-entry ledger expectation was the only failure. Corrected and covered by the fresh migration rehearsal below. |
+| Teams API, real auth, API keys, import, MCP privacy and project moves | Focused reruns passed: 11 core, four auth, three import tests. Includes viewer/member/admin, read-only keys, encoded/trailing/bearer bypass attempts and native workspace leave. |
+| Fresh migration rehearsal | Passed on a new upstream-shaped database, with concurrent/repeated startup, upstream schema preserved, six parity ledger entries and assignment/lead indexes. |
+| Parity Playwright configuration | All 12 passed, including second-page actual user sockets and synthetic Linear import. Final Teams delete-navigation flow also passed after its correction. |
+| Feature-off upstream Playwright configuration | All three passed on a separate freshly migrated local database. |
+| Browser visual checks | 1280, 1440 and 430 widths inspected in actual light/dark themes; narrow project table keeps the team picker readable and scrolls horizontally. |
+| iOS 27 simulator | More → Teams, team issues/projects, project overview clear/reassign passed. No physical device or older iOS runtime tested. |
+| Locales and OpenAPI | All 21 catalogs synchronized; generated contract current. |
+| iOS release export | Passed with `--platform ios --clear`, owner `tracing`, the supplied project ID and production URL; temporary QA source override removed. |
+
+A new web cache test initially omitted the workspace hint required by the real
+message contract; its corrected fixture passes. Two unchanged five-second API
+tests timed out under concurrent export/browser load; all sequential suites passed
+without timeout changes. Disposable preview setup required its local API URL,
+no external CAPTCHA key, and socket-close handling. A stale Metro transformer
+reference to the previous worktree was removed by a clean-cache export. Native
+QA used paced input, dismissed the system password-save prompt and matched the
+controls' actual combined accessibility labels. These setup/selector failures
+are not counted as successful checks.
+
+Production flags, Railway, production data and store submission are outside this
+slice. The final requested EAS artifact is iOS only, from `@tracing/tracing` and
+project `4dfa905a-804d-4710-a412-559fc4428e21`, after this PR is approved, green
+and merged. No Android app, keystore or build is created.
+
+The first Teams review found nine valid recovery/concurrency issues. Follow-up
+changes isolate team-hook failures from access revocation, lock imports before
+project insertion, clear assignments inside workspace moves, reapply team filters
+when reading summaries, and keep stale-filter recovery available even after the
+conservative global 404 cache clear. Assignment retry resubmits the failed value;
+roadmap filters retain supported selections and clear unavailable ones; icon input
+matches the API's 100-character bound. The legacy invite test now authenticates the
+actual invitee and checks the owned rejection code. The issue-filter browser proof
+excludes both an unassigned-project issue and another team's issue.
+
+Follow-up verification: all workspace unit suites passed (API 1,687, web 2,068,
+mobile 159, MCP 107), all 22 focused Teams/auth/import PostgreSQL tests passed,
+and the expanded Teams browser flow passed, including a synthetic failed
+assignment/retry and deletion recovery in another browser. Root types/build graph
+and lint/format passed again. No production flags or deployment were changed.
+
+A final review additionally covered flag toggling: move cleanup always clears a
+stored assignment, including while Teams is disabled, so an A→B→A round trip
+cannot resurrect it after re-enabling the feature. Both flag states pass the real
+controller regression; all fourteen core Teams integration tests pass.

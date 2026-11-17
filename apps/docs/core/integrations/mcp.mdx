@@ -143,3 +143,29 @@ When running from source in this monorepo:
 pnpm --filter @tracing/mcp run build
 pnpm --filter @tracing/mcp run start
 ```
+
+### Teams
+
+With `PARITY_FEATURES=teams`, both the HTTP and stdio catalogs offer
+`list_teams`, `get_team`, `create_team`, `update_team`, `archive_team`,
+`delete_team`, `list_team_members`, `add_team_member`, `remove_team_member`,
+and `set_project_team`. Teams organize work without granting project access.
+Project counts and issue/project lists include only projects the caller can read.
+
+Keys contain two to five uppercase ASCII letters and are unique within a
+workspace. Team creation, editing and deletion use `team:create`, `team:update`
+and `team:delete`. Membership changes require team management permission or the
+team lead; API keys additionally need `team:update`. Only existing workspace
+members can be added. Archived teams retain their projects but reject new
+assignments and members until restored with `archive_team` and `archived=false`.
+
+Pass `teamId=null` to `set_project_team` to clear an assignment. Deleting a team
+keeps every project and issue, clearing those projects to **No team**. Explicit
+null clears a team's lead, icon or color; omitted update properties are retained.
+Task identifiers stay based on the project, and task teams derive from project
+ownership.
+
+`list_workspace_tasks` accepts `team` (a team ID or `none`) and rich `team`
+filters with `is` / `is-not` and nullable values. `list_projects` accepts `team`
+and returns the paginated planning collection for that filter; use its `page` and `pageSize` parameters while `hasMore` is true. Filtered listings cover active projects. The unfiltered tool keeps its
+existing project-list contract.

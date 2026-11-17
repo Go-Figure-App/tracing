@@ -5522,6 +5522,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Team",
+				"team": "Team",
+				"noTeam": "Nessun team",
+				"issues": "Attività",
+				"projects": "Progetti",
+				"archived": "Archiviato",
+				"notFound": "Team non trovato",
+				"empty": "Nessun team per ora"
 			}
 		}
 	},
@@ -5939,7 +5949,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Periodo del ciclo",
 				"initiative": "Iniziativa",
-				"state": "Stato del flusso di lavoro"
+				"state": "Stato del flusso di lavoro",
+				"team": "Team"
 			},
 			"groups": {
 				"state": "State",
@@ -5976,6 +5987,38 @@
 		"navigation": {
 			"myIssues": "Le mie issue",
 			"newIssue": "Nuova issue"
+		},
+		"teams": {
+			"title": "Team",
+			"team": "Team",
+			"yourTeams": "I tuoi team",
+			"all": "Tutti i team",
+			"noTeam": "Nessun team",
+			"create": "Crea team",
+			"edit": "Modifica team",
+			"name": "Nome",
+			"key": "Chiave",
+			"description": "Descrizione",
+			"icon": "Icona",
+			"color": "Colore",
+			"leadId": "Responsabile",
+			"organizeOnly": "I team organizzano il lavoro. La visibilità dei progetti non cambia.",
+			"members": "Membri",
+			"noMembers": "Nessun membro per ora",
+			"selectMember": "Seleziona un membro dello spazio di lavoro",
+			"addMember": "Aggiungi membro",
+			"removeMember": "Rimuovi membro",
+			"issues": "Attività",
+			"projects": "Progetti",
+			"settings": "Impostazioni",
+			"archived": "Archiviato",
+			"restore": "Ripristina team",
+			"archive": "Archivia team",
+			"delete": "Elimina team",
+			"deleteWarning": "Eliminare questo team? Tutti i progetti e le attività verranno conservati e resteranno senza team.",
+			"notFound": "Team non trovato",
+			"empty": "Nessun team per ora",
+			"counts": "{{members}} membri · {{projects}} progetti"
 		}
 	}
 }

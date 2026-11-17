@@ -28,6 +28,9 @@ import {
   requiredInstant,
   projectStatus,
 } from "./values";
+import { enabledFeatures } from "../foundation/features";
+import { publishTeamEvent } from "../teams/events";
+import { importProjectTeam } from "../teams/import-team";
 import { writeSharedPlanning } from "./write-shared";
 import { writeUpdates } from "./write-updates";
 import { writeTaskPlanning } from "./write-tasks";
@@ -97,6 +100,7 @@ export async function writePlanningProject(
       }
       await tx.insert(projectExtTable).values({
         projectId: created.id,
+        teamId: await importProjectTeam(tx, workspaceId, data, warnings),
         status: source ? projectStatus(source.status.type) : "backlog",
         health: health(source?.health ?? null),
         leadId: identifyProjectPerson(source?.lead),
@@ -204,6 +208,8 @@ export async function writePlanningProject(
     },
   );
   await publishEvent("project.updated", { projectId: written.projectId });
+  if (enabledFeatures().includes("teams"))
+    await publishTeamEvent(workspaceId, "TEAM_UPDATED");
   await publishEvent("parity.workspace_updated", { workspaceId });
   return written;
 }

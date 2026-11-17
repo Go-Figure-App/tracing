@@ -26,7 +26,14 @@ const list = createRoute({
   tags: ["Project planning"],
   summary: "List readable projects with planning properties and progress",
   middleware: [...readWorkspace],
-  request: { params: z.object({ workspaceId: id }), query: pageQuery },
+  request: {
+    params: z.object({ workspaceId: id }),
+    query: pageQuery.extend({
+      team: id
+        .optional()
+        .describe("Team ID, or none for projects without a team"),
+    }),
+  },
   responses: {
     200: jsonResponse(
       "Project plans",
@@ -69,8 +76,8 @@ const put = createRoute({
 
 export default planningRouter()
   .openapi(list, async (c) => {
-    const { page, pageSize } = c.req.valid("query");
-    return c.json(await listProjectPlans(actor(c), page, pageSize), 200);
+    const { page, pageSize, team } = c.req.valid("query");
+    return c.json(await listProjectPlans(actor(c), page, pageSize, team), 200);
   })
   .openapi(get, async (c) =>
     c.json(await getProjectPlan(c.req.valid("param").projectId, actor(c)), 200),

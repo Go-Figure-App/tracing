@@ -311,6 +311,12 @@ function getDeviceAuthVerificationUri(): string {
   return `${base}/device`;
 }
 
+import { assertNativeTeamRouteAllowed } from "./parity/teams/native-auth";
+import {
+  provisionNewWorkspaceTeams,
+  removeWorkspaceTeamMember,
+} from "./parity/teams/initialize";
+
 export const auth = betterAuth({
   baseURL: baseURLWithoutPath,
   trustedOrigins,
@@ -593,6 +599,7 @@ export const auth = betterAuth({
           }
         },
         afterCreateOrganization: async ({ organization, user }) => {
+          await provisionNewWorkspaceTeams(organization.id);
           // Seed the editable default roles for this workspace. Each
           // role's permissions are derived from the compiled-in defaults
           // in `@tracing/permissions`; admins can later replace them in the
@@ -669,6 +676,12 @@ export const auth = betterAuth({
         },
         afterRemoveMember: async ({ member, user }) => {
           if (member?.organizationId) {
+            await removeWorkspaceTeamMember(
+              member.organizationId,
+              member.userId,
+            ).catch((error) => {
+              console.error("Team membership cleanup failed:", error);
+            });
             await handleMemberRemoved({
               workspaceId: member.organizationId,
               userId: member.userId,
@@ -907,6 +920,7 @@ export const auth = betterAuth({
       > => {
         // Runs before provider hooks can turn a key into its owner's session.
         await assertNativeAuthApiKeyAllowed(ctx);
+        await assertNativeTeamRouteAllowed(ctx);
         let organizationViewer: {
           user: { id: string };
           session: {
@@ -1250,6 +1264,12 @@ export const auth = betterAuth({
           typeof removed.organizationId === "string" &&
           removed.organizationId === ctx.body?.organizationId
         ) {
+          await removeWorkspaceTeamMember(
+            removed.organizationId,
+            removed.userId,
+          ).catch((error) => {
+            console.error("Team membership cleanup failed:", error);
+          });
           await clearMemberProjectAccess(
             removed.organizationId,
             removed.userId,

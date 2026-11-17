@@ -1,6 +1,7 @@
+import { TeamFilter } from "../teams/team-filter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkspaceLayout from "@/components/common/workspace-layout";
 import PageTitle from "@/components/page-title";
@@ -18,7 +19,7 @@ import { isAccessError } from "../foundation/access-error";
 import { refreshPlanning, usePlanningEnabled } from "../planning/queries";
 import { DatesDialog } from "./dates-dialog";
 import { RoadmapFilters } from "./filters";
-import { emptyFilters, filteredProjects } from "./grouping";
+import { availableFilters, emptyFilters, filteredProjects } from "./grouping";
 import {
   navigateWindow,
   dateValue,
@@ -40,11 +41,12 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
   const client = useQueryClient();
   const [anchor, setAnchor] = useState(() => new Date());
   const [zoom, setZoom] = useState<Zoom>("quarter");
+  const [team, setTeam] = useState("");
   const [filters, setFilters] = useState(emptyFilters);
   const [editingId, setEditingId] = useState<string | null>(null);
   const query = useQuery({
-    queryKey: ["parity", "roadmap", workspaceId],
-    queryFn: () => getRoadmap(workspaceId),
+    queryKey: ["parity", "roadmap", workspaceId, team],
+    queryFn: () => getRoadmap(workspaceId, team || undefined),
     enabled,
   });
   const mutation = useMutation({
@@ -57,7 +59,19 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
     onSuccess: () => refreshPlanning(client),
   });
   const data = isAccessError(query.error) ? undefined : query.data;
-  const projects = filteredProjects(data?.projects ?? [], filters);
+  const activeFilters =
+    data && query.isSuccess ? availableFilters(data, filters) : filters;
+  useEffect(() => {
+    if (data && query.isSuccess && !query.isFetching)
+      setFilters((current) => {
+        const next = availableFilters(data, current);
+        return next.lead === current.lead &&
+          next.initiative === current.initiative
+          ? current
+          : next;
+      });
+  }, [data, query.isSuccess, query.isFetching]);
+  const projects = filteredProjects(data?.projects ?? [], activeFilters);
   const window = timelineWindow(anchor, zoom);
   const disabled = !canUpdateProjects() || mutation.isPending || query.isError;
   const editing = data?.projects.find((project) => project.id === editingId);
@@ -131,10 +145,15 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
                 ))}
               </select>
             </div>
+            <TeamFilter
+              workspaceId={workspaceId}
+              value={team}
+              onChange={setTeam}
+            />
             {data && (
               <RoadmapFilters
                 data={data}
-                filters={filters}
+                filters={activeFilters}
                 onChange={setFilters}
               />
             )}
@@ -170,7 +189,7 @@ export function RoadmapPage({ workspaceId }: { workspaceId: string }) {
                   <TimelineView
                     projects={projects}
                     initiatives={data.initiatives}
-                    selected={filters.initiative}
+                    selected={activeFilters.initiative}
                     window={window}
                     zoom={zoom}
                     disabled={disabled}

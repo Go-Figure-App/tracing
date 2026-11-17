@@ -6,6 +6,11 @@ const events = new Set([
   "CYCLE_UPDATED",
   "TRIAGE_UPDATED",
   "VIEW_UPDATED",
+  "TEAM_CREATED",
+  "TEAM_UPDATED",
+  "TEAM_DELETED",
+  "TEAM_MEMBERSHIP_UPDATED",
+  "PROJECT_TEAM_UPDATED",
 ]);
 
 export function invalidateParity(client: QueryClient, event: { type: string }) {

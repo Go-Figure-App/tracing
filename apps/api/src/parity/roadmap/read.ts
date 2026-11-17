@@ -11,7 +11,13 @@ import { readableProjects, type Actor } from "../planning/access";
 import { emptyCounts, progress } from "../planning/progress";
 import { estimatesEnabled, progressCounts } from "../planning/progress-query";
 
-export async function getRoadmap(who: Actor) {
+import {
+  projectTeamCondition,
+  validateTeamFilter,
+} from "../teams/project-filter";
+
+export async function getRoadmap(who: Actor, team?: string) {
+  await validateTeamFilter(who, team);
   // One compact workspace snapshot; omit descriptions/update bodies and batch
   // aggregates so adding a project never adds another database round trip.
   const rows = await db
@@ -33,7 +39,7 @@ export async function getRoadmap(who: Actor) {
     .from(projectTable)
     .leftJoin(projectExtTable, eq(projectExtTable.projectId, projectTable.id))
     .leftJoin(userTable, eq(userTable.id, projectExtTable.leadId))
-    .where(readableProjects(who))
+    .where(and(readableProjects(who), projectTeamCondition(team)))
     .orderBy(asc(projectTable.name), asc(projectTable.id));
   if (!rows.length) return { projects: [], initiatives: [] };
   const ids = rows.map((row) => row.id);

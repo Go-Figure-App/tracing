@@ -1,5 +1,10 @@
 import { expect, it } from "vite-plus/test";
-import { emptyFilters, filteredProjects, roadmapGroups } from "./grouping";
+import {
+  availableFilters,
+  emptyFilters,
+  filteredProjects,
+  roadmapGroups,
+} from "./grouping";
 import { roadmapProject } from "./test-fixtures";
 
 it("supports multiple initiative memberships and puts unlinked work last", () => {
@@ -48,4 +53,30 @@ it("combines status, lead, health and initiative filters without losing unassign
       initiative: "none",
     }).map((project) => project.id),
   ).toEqual(["other"]);
+});
+
+it("clears unavailable team-dependent filters while preserving supported selections", () => {
+  const data = {
+    projects: [roadmapProject({ leadId: "lead" })],
+    initiatives: [
+      { id: "initiative", name: "Launch", color: null, position: 0 },
+    ],
+  };
+  const selected = {
+    ...emptyFilters,
+    lead: "lead",
+    initiative: "initiative",
+    status: "started",
+  };
+  expect(availableFilters(data, selected)).toEqual(selected);
+  expect(availableFilters({ projects: [], initiatives: [] }, selected)).toEqual(
+    { ...emptyFilters, status: "started" },
+  );
+  expect(
+    availableFilters(data, {
+      ...emptyFilters,
+      lead: "none",
+      initiative: "none",
+    }),
+  ).toEqual({ ...emptyFilters, lead: "none", initiative: "none" });
 });

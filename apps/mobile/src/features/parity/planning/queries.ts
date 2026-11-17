@@ -10,7 +10,8 @@ export function usePlanningEnabled(
     | "roadmap"
     | "cycles"
     | "insights"
-    | "views" = "projects",
+    | "views"
+    | "teams" = "projects",
 ) {
   const query = useQuery({
     queryKey: ["parity", "features"],

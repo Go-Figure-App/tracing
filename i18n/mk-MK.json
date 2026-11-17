@@ -5429,6 +5429,16 @@
 				"personal": "Personal",
 				"shared": "Shared",
 				"datesIn": "Dates in {{zone}}"
+			},
+			"teams": {
+				"title": "Тимови",
+				"team": "Тим",
+				"noTeam": "Без тим",
+				"issues": "Задачи",
+				"projects": "Проекти",
+				"archived": "Архивиран",
+				"notFound": "Тимот не е пронајден",
+				"empty": "Сè уште нема тимови"
 			}
 		}
 	},
@@ -5844,7 +5854,8 @@
 				"completed": "Completed date",
 				"cycle-period": "Период на циклус",
 				"initiative": "Иницијатива",
-				"state": "Статус на работниот тек"
+				"state": "Статус на работниот тек",
+				"team": "Тим"
 			},
 			"groups": {
 				"state": "State",
@@ -5881,6 +5892,38 @@
 		"navigation": {
 			"myIssues": "Мои задачи",
 			"newIssue": "Нова задача"
+		},
+		"teams": {
+			"title": "Тимови",
+			"team": "Тим",
+			"yourTeams": "Вашите тимови",
+			"all": "Сите тимови",
+			"noTeam": "Без тим",
+			"create": "Создај тим",
+			"edit": "Уреди тим",
+			"name": "Име",
+			"key": "Клуч",
+			"description": "Опис",
+			"icon": "Икона",
+			"color": "Боја",
+			"leadId": "Водач",
+			"organizeOnly": "Тимовите ја организираат работата. Видливоста на проектите не се менува.",
+			"members": "Членови",
+			"noMembers": "Сè уште нема членови",
+			"selectMember": "Изберете член од работниот простор",
+			"addMember": "Додај член",
+			"removeMember": "Отстрани член",
+			"issues": "Задачи",
+			"projects": "Проекти",
+			"settings": "Поставки",
+			"archived": "Архивиран",
+			"restore": "Врати тим",
+			"archive": "Архивирај тим",
+			"delete": "Избриши тим",
+			"deleteWarning": "Да се избрише овој тим? Сите проекти и задачи ќе се зачуваат без тим.",
+			"notFound": "Тимот не е пронајден",
+			"empty": "Сè уште нема тимови",
+			"counts": "{{members}} членови · {{projects}} проекти"
 		}
 	}
 }
