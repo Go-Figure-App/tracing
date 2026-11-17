@@ -1,3 +1,5 @@
+import { clearMovedProjectTeam } from "../../parity/teams/project-move";
+import { publishTeamEvent } from "../../parity/teams/events";
 import { and, eq, inArray, isNotNull, max, notInArray, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import createActivities from "../../activity/controllers/create-activities";
@@ -32,7 +34,7 @@ async function moveProject(
     });
   }
 
-  const { movedProject, unassignedTasks } = await db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     // Use a stable order for both workspaces before locking the project row.
     // This also keeps source reorders from updating a project after it moves.
     for (const workspaceId of [sourceWorkspaceId, targetWorkspaceId].sort()) {
@@ -257,10 +259,16 @@ async function moveProject(
       tx,
     );
 
-    return { movedProject, unassignedTasks: unassigned };
+    const clearedTeam = await clearMovedProjectTeam(tx, id);
+    return { movedProject, unassignedTasks: unassigned, clearedTeam };
   });
 
+  const { movedProject, unassignedTasks, clearedTeam } = result;
   await closeProjectConnections(id);
+  if (clearedTeam) {
+    for (const workspaceId of [sourceWorkspaceId, targetWorkspaceId])
+      await publishTeamEvent(workspaceId, "PROJECT_TEAM_UPDATED");
+  }
 
   await publishEvent("integration.sync_labels_changed", { projectId: id });
   await publishEvent("project.updated", { projectId: id });

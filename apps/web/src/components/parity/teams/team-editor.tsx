@@ -71,7 +71,9 @@ export function TeamEditor({
                     ? 10_000
                     : field === "name"
                       ? 200
-                      : 128
+                      : field === "icon"
+                        ? 100
+                        : 128
               }
               pattern={
                 field === "key"

@@ -17,7 +17,11 @@ import {
   validateTeamFilter,
 } from "../teams/project-filter";
 
-export async function projectSummaries(who: Actor, ids?: string[]) {
+export async function projectSummaries(
+  who: Actor,
+  ids?: string[],
+  team?: string,
+) {
   if (ids?.length === 0) return [];
   const teams = enabledFeatures().includes("teams");
   const rows = await db
@@ -44,6 +48,7 @@ export async function projectSummaries(who: Actor, ids?: string[]) {
       and(
         readableProjects(who),
         ids ? inArray(projectTable.id, ids) : undefined,
+        projectTeamCondition(team),
       ),
     )
     .orderBy(asc(projectTable.name), asc(projectTable.id));
@@ -83,6 +88,7 @@ export async function listProjectPlans(
     items: await projectSummaries(
       who,
       ids.slice(0, pageSize).map((row) => row.id),
+      team,
     ),
     hasMore: ids.length > pageSize,
     page,

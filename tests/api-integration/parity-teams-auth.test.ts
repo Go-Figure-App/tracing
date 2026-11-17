@@ -83,7 +83,7 @@ it("provisions the provider default team and blocks direct and indirect raw writ
   expect(await db.select().from(schema.teamTable)).toHaveLength(1);
 });
 it("rejects old team-bearing invitation acceptance but leaves workspace invites available", async () => {
-  const { workspace, post, owner } = await setup();
+  const { app, workspace, post, owner } = await setup();
   const [team] = await db
     .select()
     .from(schema.teamTable)
@@ -98,10 +98,27 @@ it("rejects old team-bearing invitation acceptance but leaves workspace invites 
     expiresAt: new Date(Date.now() + 86400000),
     inviterId: owner.userId,
   });
-  expect(
-    (await post("accept-invitation", { invitationId: "legacy-invitation" }))
-      .status,
-  ).toBe(403);
+  const invitee = await signUpWithSession(app, {
+    name: "Invitee",
+    email: "invite@example.com",
+    role: "user",
+  });
+  const acceptance = await app.request(
+    "/api/auth/organization/accept-invitation",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Origin: "http://localhost:5173",
+        cookie: invitee.cookies,
+      },
+      body: JSON.stringify({ invitationId: "legacy-invitation" }),
+    },
+  );
+  expect(acceptance.status).toBe(403);
+  expect(await acceptance.json()).toMatchObject({
+    code: "TEAMS_PARITY_ROUTE_REQUIRED",
+  });
   const response = await post("invite-member", {
     organizationId: workspace.id,
     email: "plain@example.com",
@@ -209,4 +226,53 @@ it("does not bypass owned rules through trailing, encoded or bearer auth team wr
   });
   expect(response.status).toBe(403);
   expect(await db.select().from(schema.teamTable)).toHaveLength(1);
+});
+
+it("still clears project grants and revokes sockets when team removal cleanup fails", async () => {
+  const { app, workspace, post } = await setup();
+  const member = await signUpWithSession(app, {
+    name: "Removed",
+    email: "removed-team@example.com",
+    role: "user",
+  });
+  const [membership] = await db
+    .insert(schema.workspaceUserTable)
+    .values({
+      workspaceId: workspace.id,
+      userId: member.userId,
+      role: "member",
+      joinedAt: new Date(),
+    })
+    .returning();
+  const { createProjectFixture } = await import("./helpers/fixtures");
+  const { project } = await createProjectFixture({
+    workspaceId: workspace.id,
+  });
+  await db.insert(schema.workspaceMemberProjectTable).values({
+    workspaceId: workspace.id,
+    userId: member.userId,
+    projectId: project.id,
+  });
+  const teams = await import("../../apps/api/src/parity/teams/initialize");
+  const ws = await import("../../apps/api/src/ws");
+  const cleanup = vi
+    .spyOn(teams, "removeWorkspaceTeamMember")
+    .mockRejectedValueOnce(new Error("Synthetic team cleanup failure"));
+  const revoke = vi.spyOn(ws, "revokeWorkspaceConnections");
+  try {
+    const response = await post("remove-member", {
+      organizationId: workspace.id,
+      memberIdOrEmail: membership.id,
+    });
+    expect(response.status, await response.text()).toBe(200);
+    expect(await db.select().from(schema.workspaceMemberProjectTable)).toEqual(
+      [],
+    );
+    expect(revoke).toHaveBeenCalledWith(member.userId, workspace.id, {
+      role: "user",
+    });
+  } finally {
+    cleanup.mockRestore();
+    revoke.mockRestore();
+  }
 });

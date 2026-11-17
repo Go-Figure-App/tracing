@@ -134,6 +134,7 @@ export async function getInitiative(id: string, who: Actor, team?: string) {
   const projects = await projectSummaries(
     who,
     links.map((link) => link.projectId),
+    team,
   );
   const positions = new Map(
     links.map((link) => [link.projectId, link.position]),

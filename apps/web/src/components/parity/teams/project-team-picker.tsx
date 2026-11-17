@@ -58,7 +58,14 @@ export function ProjectTeamPicker({
       {(mutation.error || teams.error) && (
         <p role="alert">
           {(mutation.error ?? teams.error)?.message}
-          <button onClick={() => void teams.refetch()}>
+          <button
+            disabled={mutation.isPending}
+            onClick={() => {
+              if (mutation.isError && mutation.variables !== undefined)
+                mutation.mutate(mutation.variables);
+              else void teams.refetch();
+            }}
+          >
             {t("parity:planning.retry")}
           </button>
         </p>

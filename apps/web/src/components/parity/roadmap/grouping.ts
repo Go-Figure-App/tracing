@@ -49,3 +49,23 @@ export function roadmapGroups(
     });
   return groups.filter((group) => group.projects.length);
 }
+
+export function availableFilters(data: Roadmap, filters: Filters): Filters {
+  return {
+    ...filters,
+    lead:
+      !filters.lead ||
+      filters.lead === "none" ||
+      data.projects.some((project) => project.leadId === filters.lead)
+        ? filters.lead
+        : "",
+    initiative:
+      !filters.initiative ||
+      filters.initiative === "none" ||
+      data.initiatives.some(
+        (initiative) => initiative.id === filters.initiative,
+      )
+        ? filters.initiative
+        : "",
+  };
+}

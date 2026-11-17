@@ -78,3 +78,26 @@ it("does nothing when teams is disabled", async () => {
   ).toBeUndefined();
   expect(await db.select().from(schema.teamTable)).toEqual([]);
 });
+
+it("serializes concurrent project imports before foreign-key and team locks", async () => {
+  const { workspace, user } = await createWorkspaceMember();
+  const { createImportProject } =
+    await import("../../apps/api/src/import/writer/create-import-project");
+  const { lockCycleWorkspace } =
+    await import("../../apps/api/src/parity/cycles/access");
+  const imported = await Promise.all(
+    ["First", "Second"].map((name) =>
+      createImportProject(
+        { workspaceId: workspace.id, userId: user.id, name },
+        async (tx, project) => {
+          await lockCycleWorkspace(tx, workspace.id);
+          const teamId = await importProjectTeam(tx, workspace.id, data(), []);
+          return { projectId: project.id, teamId };
+        },
+      ),
+    ),
+  );
+  expect(imported[0].teamId).toBe(imported[1].teamId);
+  expect(imported[0].teamId).toBeTruthy();
+  expect(await db.select().from(schema.projectTable)).toHaveLength(2);
+});

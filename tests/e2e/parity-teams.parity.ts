@@ -49,6 +49,37 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
     status: columns[0].slug,
     priority: "medium",
   });
+  const otherTeam = await post(`parity/teams/${workspace.id}`, {
+    name: "Other QA",
+    key: "OTH",
+  });
+  for (const [name, slug, teamId] of [
+    ["No team control", "NTC", null],
+    ["Other team control", "OTC", otherTeam.id],
+  ]) {
+    const project = await post("project", {
+      workspaceId: workspace.id,
+      name,
+      slug,
+      icon: "Layout",
+    });
+    if (teamId) {
+      const assigned = await page.request.put(
+        `/api/parity/project-plan/${project.id}`,
+        { headers, data: { teamId } },
+      );
+      await expect(assigned).toBeOK();
+    }
+    const columns = await (
+      await page.request.get(`/api/column/${project.id}`)
+    ).json();
+    await post(`task/${project.id}`, {
+      title: name,
+      description: "",
+      status: columns[0].slug,
+      priority: "medium",
+    });
+  }
   const base = `/dashboard/workspace/${workspace.id}`;
   await page.goto(`${base}/teams`);
   await page.getByRole("button", { name: "Create team", exact: true }).click();
@@ -88,6 +119,19 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
     .getByRole("button", { name: "Remove member", exact: true })
     .click();
   await expect(page.getByText("No members yet", { exact: true })).toBeVisible();
+  await page.route(
+    `**/api/parity/project-plan/${projects[0].id}`,
+    async (route) => {
+      if (route.request().method() === "PUT")
+        await route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Synthetic assignment failure" }),
+        });
+      else await route.continue();
+    },
+    { times: 1 },
+  );
   for (const project of projects) {
     await page.goto(`${base}/projects`);
     const row = page.getByRole("row").filter({
@@ -96,6 +140,10 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
     await row
       .getByRole("combobox", { name: "Team", exact: true })
       .selectOption(team.id);
+    if (project.id === projects[0].id) {
+      await expect(row.getByRole("alert")).toBeVisible();
+      await row.getByRole("button", { name: "Try again", exact: true }).click();
+    }
     await expect(
       row.getByRole("combobox", { name: "Team", exact: true }),
     ).toHaveValue(team.id);
@@ -113,6 +161,7 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
     .getByRole("combobox", { name: "Field", exact: true })
     .selectOption("team");
   await page.getByRole("button", { name: "Filter value", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Not set", exact: true }).uncheck();
   await page
     .getByRole("checkbox", { name: "Engineering QA", exact: true })
     .check();
@@ -120,6 +169,12 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
   await expect(
     page.getByText("Teams launch issue", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText("No team control", { exact: true }),
+  ).not.toBeVisible();
+  await expect(
+    page.getByText("Other team control", { exact: true }),
+  ).not.toBeVisible();
   await page.goto(`${base}/projects`);
   const row = page.getByRole("row").filter({
     has: page.getByRole("link", { name: "Website launch", exact: true }),
@@ -172,6 +227,12 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
         animations: "disabled",
       });
     }
+  const filtered = await context.newPage();
+  await filtered.goto(`${base}/projects`);
+  await filtered
+    .getByRole("combobox", { name: "Team", exact: true })
+    .first()
+    .selectOption(team.id);
   await page.goto(`${base}/teams/${team.id}/settings`);
   await page.getByRole("button", { name: "Delete team", exact: true }).click();
   await expect(
@@ -184,6 +245,18 @@ test("Teams manage membership and project ownership, retain issues on deletion, 
   await expect(
     second.getByText("ENG · Engineering QA", { exact: true }),
   ).toHaveCount(0);
+  // A 404 conservatively clears every parity cache; the recovery action must
+  // remain available even when that also marks the team-list query as failed.
+  await filtered
+    .getByRole("button", { name: "All teams", exact: true })
+    .click();
+  await expect(
+    filtered.getByRole("combobox", { name: "Team", exact: true }).first(),
+  ).toHaveValue("");
+  await expect(
+    filtered.getByRole("link", { name: "Website launch", exact: true }),
+  ).toBeVisible();
+  await filtered.close();
   const retained = await page.request.get(`/api/task/${issue.id}`);
   await expect(retained).toBeOK();
   for (const project of projects) {

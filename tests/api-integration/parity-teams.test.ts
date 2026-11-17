@@ -336,3 +336,57 @@ it("ignores moved assignments immediately and reconciles hints to both workspace
     teamId: null,
   });
 });
+
+it("clears team assignments atomically through rapid workspace round trips", async () => {
+  const c = await setup();
+  await c.send(`project-plan/${c.alpha.id}`, "PUT", { teamId: c.team.id });
+  const destination = await createWorkspaceMember({ role: "owner" });
+  await db.insert(schema.workspaceUserTable).values({
+    workspaceId: destination.workspace.id,
+    userId: c.owner.id,
+    role: "owner",
+    joinedAt: new Date(),
+  });
+  const { default: moveProject } =
+    await import("../../apps/api/src/project/controllers/move-project");
+  const teamEvents = await import("../../apps/api/src/parity/teams/events");
+  const hints = vi.spyOn(teamEvents, "publishTeamEvent");
+  await moveProject(
+    c.alpha.id,
+    c.workspace.id,
+    destination.workspace.id,
+    c.owner.id,
+  );
+  await moveProject(
+    c.alpha.id,
+    destination.workspace.id,
+    c.workspace.id,
+    c.owner.id,
+  );
+  const { projectExtTable } =
+    await import("../../apps/api/src/database/schema-parity");
+  const [extension] = await db
+    .select()
+    .from(projectExtTable)
+    .where(eq(projectExtTable.projectId, c.alpha.id));
+  expect(extension.teamId).toBeNull();
+  expect(hints).toHaveBeenCalledWith(c.workspace.id, "PROJECT_TEAM_UPDATED");
+  expect(hints).toHaveBeenCalledWith(
+    destination.workspace.id,
+    "PROJECT_TEAM_UPDATED",
+  );
+});
+it("rechecks a team filter when previously selected summary IDs change assignment", async () => {
+  const c = await setup();
+  await c.send(`project-plan/${c.alpha.id}`, "PUT", { teamId: c.team.id });
+  const { projectSummaries } =
+    await import("../../apps/api/src/parity/planning/project-read");
+  await c.send(`project-plan/${c.alpha.id}`, "PUT", { teamId: null });
+  expect(
+    await projectSummaries(
+      { workspaceId: c.workspace.id, userId: c.owner.id },
+      [c.alpha.id],
+      c.team.id,
+    ),
+  ).toEqual([]);
+});

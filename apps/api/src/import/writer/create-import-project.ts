@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import db from "../../database";
 import { projectTable } from "../../database/schema";
 import {
@@ -35,6 +35,10 @@ export async function createImportProject<T>(
     existing.map((row) => row.slug),
     (slug) =>
       db.transaction(async (tx) => {
+        // Serialize before the insert takes a workspace foreign-key lock.
+        await tx.execute(
+          sql`SELECT pg_advisory_xact_lock(1524, hashtext(${workspaceId}))`,
+        );
         const project = await insertUnplacedProject(tx, {
           workspaceId,
           name,

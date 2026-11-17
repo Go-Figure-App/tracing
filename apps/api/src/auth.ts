@@ -679,7 +679,9 @@ export const auth = betterAuth({
             await removeWorkspaceTeamMember(
               member.organizationId,
               member.userId,
-            );
+            ).catch((error) => {
+              console.error("Team membership cleanup failed:", error);
+            });
             await handleMemberRemoved({
               workspaceId: member.organizationId,
               userId: member.userId,

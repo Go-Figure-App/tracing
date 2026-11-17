@@ -1089,6 +1089,12 @@ paginated active planning collections and keep the unfiltered legacy contract.
 - `apps/api/src/database/schema-parity.ts`, `apps/api/drizzle-parity/0005_teams.sql`
   and its journal/snapshot: additive owned data only; inline named foreign keys
   match the generated snapshot. Upstream schema/migrations are untouched.
+- `apps/api/src/import/writer/create-import-project.ts`: acquires the existing
+  workspace advisory lock before inserting a project, avoiding foreign-key lock
+  upgrade deadlocks during concurrent planning imports.
+- `apps/api/src/project/controllers/move-project.ts`: invokes the owned team-clear
+  helper in the move transaction and publishes refetch hints to both workspaces
+  after commit, so rapid round trips cannot retain an old assignment.
 - `apps/api/src/auth.ts`: mounts the owned before guard and workspace lifecycle
   hooks. `apps/api/src/index.ts`: initializes provisioning after migrations.
 - `apps/api/src/parity/index.ts`, `foundation/features.ts` and
@@ -1159,3 +1165,19 @@ Production flags, Railway, production data and store submission are outside this
 slice. The final requested EAS artifact is iOS only, from `@tracing/tracing` and
 project `4dfa905a-804d-4710-a412-559fc4428e21`, after this PR is approved, green
 and merged. No Android app, keystore or build is created.
+
+The first Teams review found nine valid recovery/concurrency issues. Follow-up
+changes isolate team-hook failures from access revocation, lock imports before
+project insertion, clear assignments inside workspace moves, reapply team filters
+when reading summaries, and keep stale-filter recovery available even after the
+conservative global 404 cache clear. Assignment retry resubmits the failed value;
+roadmap filters retain supported selections and clear unavailable ones; icon input
+matches the API's 100-character bound. The legacy invite test now authenticates the
+actual invitee and checks the owned rejection code. The issue-filter browser proof
+excludes both an unassigned-project issue and another team's issue.
+
+Follow-up verification: all workspace unit suites passed (API 1,687, web 2,068,
+mobile 159, MCP 107), all 22 focused Teams/auth/import PostgreSQL tests passed,
+and the expanded Teams browser flow passed, including a synthetic failed
+assignment/retry and deletion recovery in another browser. Root types/build graph
+and lint/format passed again. No production flags or deployment were changed.

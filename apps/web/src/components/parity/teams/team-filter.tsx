@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { usePlanningEnabled } from "../planning/queries";
 import { useTeams } from "./queries";
@@ -13,6 +14,17 @@ export function TeamFilter({
   const { t } = useTranslation();
   const enabled = usePlanningEnabled("teams");
   const query = useTeams(workspaceId);
+  useEffect(() => {
+    if (
+      enabled &&
+      query.isSuccess &&
+      !query.isFetching &&
+      value &&
+      value !== "none" &&
+      !query.data.some((team) => team.id === value)
+    )
+      onChange("");
+  }, [enabled, query.isSuccess, query.isFetching, query.data, value, onChange]);
   if (!enabled) return null;
   return (
     <label className="flex items-center gap-2 text-xs">
@@ -35,6 +47,16 @@ export function TeamFilter({
       {query.isError && (
         <button onClick={() => void query.refetch()}>
           {t("parity:planning.retry")}
+        </button>
+      )}
+      {query.isError && value && (
+        <button
+          onClick={() => {
+            onChange("");
+            void query.refetch();
+          }}
+        >
+          {t("parity:teams.all")}
         </button>
       )}
     </label>

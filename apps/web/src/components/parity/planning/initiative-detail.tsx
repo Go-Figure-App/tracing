@@ -113,6 +113,11 @@ export function InitiativeDetail({
             ) : query.error ? (
               <div role="alert">
                 {query.error.message}
+                <TeamFilter
+                  workspaceId={workspaceId}
+                  value={team}
+                  onChange={setTeam}
+                />
                 <Button variant="ghost" onClick={() => query.refetch()}>
                   {t("parity:planning.retry")}
                 </Button>
@@ -238,8 +243,9 @@ export function InitiativeDetail({
                           {t("parity:planning.noProjects")}
                         </p>
                       )}
+
                       <TeamFilter
-                        workspaceId={initiative.workspaceId}
+                        workspaceId={workspaceId}
                         value={team}
                         onChange={setTeam}
                       />
