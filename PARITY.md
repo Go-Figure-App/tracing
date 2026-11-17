@@ -2,6 +2,271 @@
 
 Phase 0 implements the foundation from the technical design attached to [GOF-272](https://linear.app/gofigure/issue/GOF-272). Later phases require a separate branch, pull request and review. The fork remote is `Go-Figure-App/tracing`; never open parity pull requests against `usekaneo/kaneo`.
 
+## Teams — design spike, November 16, 2026
+
+**Status: Phase A only; maintainer design approval pending.** This section
+proposes Teams v1 and the screenshot-led native navigation follow-up. It does
+not enable Teams, apply a new migration, or change application behavior. The
+existing "no independent team model" comparison remains accurate until Phase B
+lands. Phase C requires its own approval before implementation. No deployment,
+production-data inspection, Railway change or distribution upload is included.
+
+### Identity and membership
+
+Recommend **Option 1: reuse Better Auth's `team` and `team_member`**, with a
+parity `team_ext`. The installed provider is pinned to `better-auth@1.7.14`.
+Upstream migration `0067_better_auth_team_membership.sql` already supplies
+`member_count` and nullable unique `membership_key`; existing legacy memberships
+may have null keys. The existing schema-upgrade test covers such rows. No
+production rows were read or counted. There is no evidence here about which
+teams a particular deployment currently contains.
+
+The spike checks the real auth routes against a new disposable PostgreSQL
+database named `tracing_teams_spike_test`, with the feature disabled. It does
+not mock sessions or replace provider authorization. Findings:
+
+- Workspace creation creates a same-name default team, adds its creator, sets
+  `member_count=1`, and selects that team for the creating session.
+- The default team counts toward `maximumTeams: 10`. Sequential creation of
+  nine more teams succeeds; creation of an eleventh is rejected. Provider code
+  implements this as list-then-create, so it is not a concurrency guarantee.
+- An active team cannot be deleted through the provider endpoint. After
+  clearing the active team, `allowRemovingAllTeams: false` still rejects
+  deletion of the last team. These restrictions are endpoint behavior, not
+  database constraints.
+- The existing permission vocabulary already includes `team:create`,
+  `team:update` and `team:delete`. Default admin/owner roles grant them;
+  viewer/member roles do not. No new permission statement is necessary.
+- Team lists require workspace membership and Tracing's `workspace:read`.
+  Provider member-listing additionally requires the caller to belong to that
+  team, even for a workspace admin. V1 needs an owned member-list endpoint
+  because teams organize work rather than restricting visibility.
+- Provider membership writes use `member:update` for adding and
+  `member:delete` for removing; the existing native API-key boundary also
+  requires `team:update`. They do not implement Tracing's proposed lead rule.
+  Adding someone who is not a workspace member is rejected.
+
+Exposed team paths under `/api/auth/organization`:
+
+| Method and path | Existing provider rule, in addition to Tracing's native boundary |
+| --- | --- |
+| `POST /create-team` | Workspace member with `team:create`; ten-team limit. |
+| `POST /update-team` | Workspace member with `team:update`. |
+| `POST /remove-team` | Workspace member with `team:delete`; active/last-team protections. |
+| `GET /list-teams` | Workspace member. |
+| `GET /list-user-teams` | Own teams; another user's teams require `member:update`. |
+| `GET /list-team-members` | Workspace and team membership. |
+| `POST /add-team-member` | `member:update`; target must be a workspace member. |
+| `POST /remove-team-member` | `member:delete`; target must be a workspace member. |
+| `POST /set-active-team` | Caller belongs to the selected team; null clears. |
+
+The source and [provider documentation](https://www.better-auth.com/docs/plugins/organization)
+expose organization/team lifecycle hooks. Tracing already has a global
+`createAuthMiddleware` before hook in `auth.ts` that rejects and short-circuits
+organization routes. A small mount there can call an owned Teams guard: when
+Teams is enabled, reject raw team mutation endpoints and direct clients to
+`/api/parity/teams`. Preserve their exact existing behavior with Teams disabled.
+Keep read/session-selection endpoints subject to existing access checks; these
+do not assign projects or change team metadata.
+
+A separate test provider instance using the application's existing options and
+an additional before hook rejects `create-team` with 403 and leaves the team
+table unchanged. This proves a config-only guard is feasible; it is not the
+complete Phase B bypass defense.
+
+Guard indirect membership paths too: invitation `teamId`, acceptance of old
+team-bearing invitations, and native organization member operations must not
+silently bypass membership events or the archived-team rule. Existing workspace
+member removal must still clean team memberships and reconcile leads/counts.
+Use provider lifecycle hooks where the route itself must remain usable. Guard
+both cookie and API-key callers, and test omitted organization IDs, explicit
+IDs, other workspaces and native bearer sessions. Do not modify provider code
+or bypass the existing native auth security checks.
+
+Owned controllers will write identity, membership, count and side rows in one
+database transaction. Use the provider's observed canonical membership-key
+format and handle legacy null-key memberships idempotently. Serialize creates,
+membership changes and deletes with workspace/team row locks; do not rely on
+the provider's list-then-create limit. Reuse ten total teams (including archived
+teams) for v1. Deleting the final team is allowed through the owned API and
+clears affected session selections/invitation references. It preserves every
+project and task. Default-team provisioning remains unchanged with the flag
+off; feature-enabled provisioning must create its extension using the same
+key allocator as ordinary team creation.
+
+### Proposed v1 model and permissions
+
+Teams **organize only**. They never grant project access. Every team project
+count/list, issue query, roadmap and MCP result intersects current readable
+projects from `project-access/find-accessible-projects.ts`. Membership counts
+describe workspace members of the team, independent of project visibility.
+Events carry only type/workspace hints; clients refetch authorized responses.
+Redis stays optional, and access changes discard protected cached results.
+
+A project has zero or one team through nullable `project_ext.team_id` with
+`ON DELETE SET NULL` and an index. Missing extension rows mean "No team".
+A task derives its team from its project. Many-to-many project ownership would
+make a task's team ambiguous and is unnecessary for v1. Assigning a team must
+check both workspace identity and existing project-update permission. Moving a
+project between workspaces must clear its old team; reads must immediately
+ignore stale cross-workspace assignments before subscribers reconcile them.
+
+`team_ext` contains the requested key, description, icon, color, lead,
+archive timestamp and position; `team_id` is its cascading primary foreign key.
+**Proposed clarification requiring approval:** also store `workspace_id` on
+`team_ext`, with an inline workspace foreign key and unique `(workspace_id,
+key)` index. PostgreSQL cannot enforce per-workspace key uniqueness by joining
+the parent team from an index. Validate that the extension and identity belong
+to the same workspace inside the locked write transaction; do not add a
+constraint or column to the upstream team table.
+
+Keys are 2–5 ASCII uppercase letters (`^[A-Z]{2,5}$`), unique even for archived
+teams; API filtering uses stable team IDs, while keys appear in the UI. Keep
+per-project task numbering and identifiers. Before enabling Teams, provision
+extensions for existing default/legacy teams with deterministic, collision-safe
+keys under a workspace lock; preserve their identity and membership. Provisioning
+must be repeatable and must not assign existing projects. Keep feature-disabled
+startup free of this data provisioning. Changing task identifiers is out of scope.
+
+Propose that `teams` imply `projects` and `views` because the team pages reuse
+their gated project and issue APIs. Feature discovery and both clients must
+agree on these dependencies. Merely leaving Teams disabled must not change
+existing planning or provider behavior.
+
+Use `requireWorkspacePermission` and the existing `team:*` vocabulary for
+team CRUD; this respects editable workspace roles and API-key scope. The default
+roles give CRUD to admin/owner only. Membership writes require workspace-read
+and either team-management authority or the current lead; even a lead's API
+key must have the explicit mutation scope. Leads must remain workspace members;
+clear a lead removed from the workspace. Archived teams stay readable, can be
+restored/deleted, retain existing project assignments, and reject new project
+assignments/membership additions until restored. Assignment clearing and member
+removal remain available. Every reverse action is tested.
+
+Migration `0005_teams.sql` belongs in `drizzle-parity`, not upstream `drizzle`.
+The independent startup ledger/advisory lock stays unchanged. The migration is
+additive; project-team references target the existing team table with inline
+foreign keys, and no upstream schema file changes.
+
+### PR sequence and screenshot-led mobile scope
+
+1. **Teams design spike (this change):** this design and executable provider
+   characterization. Obtain maintainer design approval before Phase B.
+2. **Teams core (Phase B, one PR):** gated schema/API, privacy-aware filters,
+   realtime invalidation, web navigation/settings/properties, native Teams
+   under More and the project picker, ten shared HTTP/stdio MCP tools, Linear
+   team import, translated catalogs, docs and behavioral verification. Shared
+   modules receive small mounts; domain behavior stays in owned Teams modules.
+3. **Native navigation and visual parity (separate PR):** implement the real
+   iOS system glass bottom bar using the already installed SDK 58
+   `expo-router/native-tabs`; no added native package. Move the state-selected
+   home tabs into routes under a tabs layout while retaining root-stack detail
+   navigation, deep links, workspace selection, unread badges and authenticated
+   realtime handling. Keep Android native navigation and older-iOS system
+   fallbacks. Verify installed native-module compatibility in a rebuilt local
+   simulator app before claiming glass support.
+   Use the eight supplied screenshots for large headers, compact icon rows,
+   pill controls, selected-tab treatment and the destination menu. Keep existing
+   Tracing destinations reachable. Native system tabs may not reproduce Linear's
+   custom expanding fourth slot exactly; verify the supported API before adding
+   that interaction. The separate round action should open a real existing
+   action such as issue creation; do not invent an Agent feature. Review light,
+   dark, safe-area/scroll overlap, keyboard, accessibility, back navigation and
+   workspace switching. Keep private screenshots outside the repository/PR.
+4. **Team cycles/triage (Phase C):** design below is pending, with a separate
+   approval before any cycle-model implementation PR.
+
+For every implementation PR: run required local checks, push to
+`Go-Figure-App/tracing`, inspect the review on the latest head, fix valid findings,
+resolve discussions, and require approval plus every required check green on
+that same head before merging. Do not substitute green CI for review approval.
+Do not enable production flags, deploy, or submit a distribution build.
+
+Native API research: the [Expo native tabs guide](https://docs.expo.dev/router/advanced/native-tabs/)
+documents SDK 58's stable import and system glass behavior. The installed Router
+package exports that path. Its guide is supporting evidence; simulator behavior
+has not been checked during this design-only phase.
+
+### Expected shared-file register for implementation (proposed)
+
+| Shared file(s) | Reason and limit |
+| --- | --- |
+| `apps/api/src/auth.ts` | Mount owned raw-team guard and lifecycle integration; retain current auth checks. |
+| `apps/api/src/database/schema-parity.ts` | Owned team extension and nullable project-team link. |
+| `apps/api/src/database/index.ts` | Export/register the new side table. |
+| `apps/api/src/index.ts` | Initialize owned provisioning/event integration if needed. |
+| `packages/mcp/src/tools/register.ts` | Mount the owned Teams registrar for HTTP and stdio. |
+| `apps/web/src/components/app-sidebar.tsx` | Mount the feature-gated Your teams section. |
+| `apps/web/src/components/settings/nav/use-settings-nav.ts` | Mount Teams settings navigation. |
+| `apps/web/src/routeTree.gen.ts` | Generate new team/settings routes. |
+| `apps/mobile/src/app/(app)/index.tsx` | Integrate Teams capability, then extract shared workspace/realtime state for native tabs. |
+| `apps/mobile/src/app/(app)/_layout.tsx` | Mount nested native tabs while retaining the detail stack. |
+| `apps/mobile/src/features/home/bottom-nav.tsx` | Replace the current custom bar with the native layout. |
+| `apps/mobile/src/features/home/home-tab.tsx` | Preserve Home actions and workspace switching after route extraction if necessary. |
+| `apps/mobile/src/components/screen.tsx` | Adjust inset ownership only if native-tab verification requires it. |
+| `apps/docs/openapi.json` | Generate the accurate gated API contract. |
+| `tests/e2e/compose.parity.yml`, `tests/e2e/smoke.spec.ts` | Enable teams in synthetic parity tests and check feature-off navigation. |
+| `i18n/en-US.json`, 20 catalogs, `i18n/schema.json` | New web/native strings, synchronized and translated; catalog edits counted separately. |
+
+Owned planning, views, roadmap, import, foundation and native More modules also
+need team-aware contracts/filters/cache handling; record their actual paths and
+reasons in Phase B. New routes are thin mounts. No large shared-file rewrite,
+upstream schema/controller change, dependency or lockfile change is proposed.
+Revise this register to actual edits before each PR review.
+
+### Phase C proposal — not approved for implementation
+
+Add nullable `cycle.team_id` to the parity-owned cycle table and a parity team
+settings table. Existing rows retain null and workspace settings; never infer
+past ownership from today's project assignments. Replace the existing
+`(workspace_id, number)` index with two explicit uniqueness domains: workspace
+cycles `(workspace_id, number) WHERE team_id IS NULL` and team cycles
+`(team_id, number) WHERE team_id IS NOT NULL`. Preserve cycle IDs, historical
+dates, task links, daily points and closed summaries. This index change and
+the following behavior require approval beyond Phase B's additive-only model.
+
+Tick/rollover locks must identify workspace and optional team; disabled team
+cadences must not prevent workspace ticks. Use each scope's timezone/settings,
+and validate destination cycles against the task's current project team.
+Open-cycle assignment/move policy must be decided before implementation:
+recommend clearing incompatible open-cycle assignments on project-team changes,
+with an explicit event, while retaining immutable historical links. Closed
+cycles may therefore reference a project that later changes team. Do not
+recompute closed summaries or redistribute historical `cycle_day.project_totals`.
+Continue permission filtering by stored project totals; aggregate-only imported
+history stays unavailable to restricted readers. Add DST, parallel ticks,
+overlap, scope-change and historical privacy regression coverage.
+
+For triage, first add a team-filtered view over the existing pending queue using
+the team's currently readable projects. Acceptance/decline/snooze remain the
+existing operations. Do not add a second inbox store or silently alter project
+triage settings. Independent team inbox ownership/policies would be another
+design decision. Team deletion with historical cycles also needs an approved
+retention policy: recommend prohibiting hard deletion until historical scope
+can be preserved rather than collapsing duplicate team cycle numbers into the
+workspace domain. Phase B has no team-owned cycles, so its delete operation
+continues to preserve projects/tasks as specified.
+
+### Future work (Phase D only)
+
+Private teams that constrain project visibility, team workflow templates and
+team keys in task identifiers remain future work. They are not part of v1 or
+the mobile visual pass.
+
+### Teams verification
+
+| Check | Phase A result |
+| --- | --- |
+| Provider behavior on disposable PostgreSQL | Five spike tests passed, including the config-only raw-write guard. |
+| Existing team schema/membership migration regression | Both existing tests passed; no upstream migration edited. |
+| Root lint/format and typecheck | Passed; all 22 typecheck/build tasks succeeded. |
+| Locale synchronization | All 21 catalogs synchronized. No catalog changed. |
+| Root unit suites | Passed: all 26 Vite+ tasks succeeded, including 2,066 web tests and 158 native tests. The initial sandbox run denied local SMTP test sockets; the unchanged suites passed with socket permission. |
+| OpenAPI consistency | Passed unchanged after granting tsx local IPC permission. |
+| Runtime Teams, filters, import and MCP | Not implemented; Phase B awaits design approval. |
+| Native glass, browser UI and simulator | Research only; implementation/visual verification pending. |
+| Production/data/distribution | Not accessed or changed. |
+
 ## Boundaries
 
 - API logic: `apps/api/src/parity/<feature>/`.
