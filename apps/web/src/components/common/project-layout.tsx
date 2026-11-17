@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { PanelRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useProjectDetailsPreference } from "@/components/parity/planning/use-project-details-preference";
 import { ProjectDetails } from "@/components/parity/planning/project-details";
 import { FavoriteButton } from "@/components/parity/views/favorite-button";
 import { usePlanningEnabled } from "@/components/parity/planning/queries";
@@ -60,19 +61,8 @@ export default function ProjectLayout({
 }: ProjectLayoutProps) {
   const { t } = useTranslation();
   const planning = usePlanningEnabled("projects");
-  const detailsKey = `tracing:project-details:${workspaceId}`;
-  const [detailsOpen, setDetailsOpen] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem(detailsKey);
-      if (saved !== null) return saved === "open";
-    } catch {
-      /* Keep the default if preference storage is unavailable. */
-    }
-    return (
-      typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1280px)").matches
-    );
-  });
+  const [detailsOpen, setDetailsOpen] =
+    useProjectDetailsPreference(workspaceId);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: project, error: projectError } = useGetProject({
@@ -238,17 +228,7 @@ export default function ProjectLayout({
                   )}
                   aria-expanded={detailsOpen}
                   aria-controls="project-details"
-                  onClick={() => {
-                    setDetailsOpen(!detailsOpen);
-                    try {
-                      sessionStorage.setItem(
-                        detailsKey,
-                        detailsOpen ? "closed" : "open",
-                      );
-                    } catch {
-                      /* The panel still toggles without storage. */
-                    }
-                  }}
+                  onClick={() => setDetailsOpen(!detailsOpen)}
                 >
                   <PanelRight className="size-4" />
                 </Button>

@@ -86,8 +86,13 @@ export function ProjectsBoard({
                         <ProjectProperty project={project} field="targetDate" />
                       )}
                     </div>
-                    {(columns.includes("issues") ||
-                      columns.includes("progress")) && (
+                    {columns.includes("issues") && (
+                      <p className="text-xs text-muted-foreground">
+                        {t("parity:planning.issues")}:{" "}
+                        {number.format(project.progress.total)}
+                      </p>
+                    )}
+                    {columns.includes("progress") && (
                       <p className="text-xs text-muted-foreground">
                         {t("parity:planning.completed", project.progress)}
                       </p>

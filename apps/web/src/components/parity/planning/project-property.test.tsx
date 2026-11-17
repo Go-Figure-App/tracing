@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -83,9 +84,12 @@ it("changes only the selected property, preserving concurrent changes to other f
   fireEvent.click(
     screen.getByRole("button", { name: /parity:planning.status:/ }),
   );
-  fireEvent.change(screen.getByRole("combobox"), {
-    target: { value: "started" },
-  });
+  fireEvent.change(
+    screen.getByLabelText("parity:planning.status", { exact: true }),
+    {
+      target: { value: "started" },
+    },
+  );
   fireEvent.click(screen.getByRole("button", { name: "parity:planning.save" }));
   await waitFor(() =>
     expect(updateProjectPlan).toHaveBeenCalledWith("project", {
@@ -144,4 +148,34 @@ it("renders read-only values without write controls when project updates are for
   expect(screen.getByText("Alex")).toBeVisible();
   expect(screen.queryByRole("button")).toBeNull();
   expect(getProjectMembers).not.toHaveBeenCalled();
+});
+
+it("keeps a pending save locked and preserves its error when dismissal is attempted", async () => {
+  let fail!: (error: Error) => void;
+  vi.mocked(updateProjectPlan).mockImplementation(
+    () =>
+      new Promise((_, reject) => {
+        fail = reject;
+      }),
+  );
+  mount("priority");
+  const trigger = screen.getByRole("button", {
+    name: /parity:planning.priority:/,
+  });
+  fireEvent.click(trigger);
+  fireEvent.click(screen.getByRole("button", { name: "parity:planning.save" }));
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "parity:planning.save" }),
+    ).toBeDisabled(),
+  );
+  fireEvent.keyDown(screen.getByRole("combobox"), { key: "Escape" });
+  fireEvent.click(trigger);
+  expect(screen.getByRole("combobox")).toBeVisible();
+  expect(
+    screen.getByRole("button", { name: "parity:planning.save" }),
+  ).toBeDisabled();
+  expect(updateProjectPlan).toHaveBeenCalledTimes(1);
+  await act(async () => fail(new Error("Save rejected")));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Save rejected");
 });

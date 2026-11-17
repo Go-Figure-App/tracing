@@ -12,6 +12,7 @@ import { updateProjectPlan, type PlanInput } from "@/fetchers/parity/projects";
 import getProjectMembers from "@/fetchers/workspace-user/get-project-members";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { formatDateMedium } from "@/lib/format";
+import { getInitials } from "@/lib/get-initials";
 import { getPriorityIcon } from "@/lib/priority";
 import { priorities, projectStatuses, usePlanningLabels } from "./labels";
 import type { ProjectSummary } from "./project-collection";
@@ -91,7 +92,13 @@ export function ProjectProperty({
     ) : field === "priority" ? (
       getPriorityIcon(project.priority)
     ) : field === "leadId" ? (
-      <UserRound className="size-3.5 shrink-0" />
+      project.leadId && project.leadName ? (
+        <span className="flex size-5 items-center justify-center rounded-full bg-muted text-[9px] font-medium text-foreground">
+          {getInitials(project.leadName)}
+        </span>
+      ) : (
+        <UserRound className="size-3.5 shrink-0" />
+      )
     ) : (
       <CalendarDays className="size-3.5 shrink-0" />
     );
@@ -125,6 +132,7 @@ export function ProjectProperty({
     <Popover
       open={open}
       onOpenChange={(next) => {
+        if (mutation.isPending) return;
         setOpen(next);
         if (next) mutation.reset();
       }}
@@ -156,6 +164,7 @@ export function ProjectProperty({
               <input
                 type="date"
                 name="value"
+                aria-label={label}
                 defaultValue={project[field] ?? ""}
                 className="h-8 min-w-0 rounded-md border bg-background px-2"
                 disabled={mutation.isPending}
@@ -163,6 +172,7 @@ export function ProjectProperty({
             ) : (
               <select
                 name="value"
+                aria-label={label}
                 defaultValue={project[field] ?? ""}
                 className="h-8 rounded-md border bg-background px-2"
                 disabled={
